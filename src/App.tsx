@@ -1,10 +1,15 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import './App.css';
 import Game from './model/game';
+import PlayerConfig from './model/playerConfig';
 import { parseInput, ParseResponseType } from './model/userinput/input';
 import useStateRef from './useStateRef';
 import InputBox from './view/inputBox';
 import Log from './view/log';
+
+enum GameScreen {
+    SETUP, GAMEPLAY
+};
 
 function App() {
     const [inputContent, _setInputContent] = useState("");
@@ -12,7 +17,13 @@ function App() {
     const [logEntries, setLogEntries, logEntriesRef] = useStateRef<string[]>([]);
     const [errorMessage, setErrorMessage] = useState("");
 
-    const game = useRef(new Game(log, error));
+    const gameScreen = useRef(GameScreen.SETUP);
+    const playerSetup = useRef(new PlayerConfig());
+    const game = useRef<Game | null>(null);
+
+    useEffect(() => {
+        log(playerSetup.current.promptMessage());
+    }, []);
 
     function log(message: string) {
         setErrorMessage("");
@@ -27,8 +38,8 @@ function App() {
         setErrorMessage(message);
     }
 
-    function setTextInputContext(content: string) {
-        if (content !== inputContent) {
+    function setInputContent(content: string) {
+        if (content !== inputContent && gameScreen.current === GameScreen.GAMEPLAY && game.current !== null) {
             const parsed = parseInput(content.trim(), game.current);
             if (parsed.type === ParseResponseType.SUGGESTIONS && parsed.options.length === 1) {
                 const option = parsed.options[0];
@@ -42,6 +53,39 @@ function App() {
 
     function keyDown(event: React.KeyboardEvent<HTMLInputElement>) {
         if (event.key === "Tab") {
+            handleTab();
+            event.preventDefault();
+        } else if (event.key === "Enter") {
+            handleEnter();
+            event.preventDefault();
+        }
+    }
+
+    function handleEnter() {
+        if (gameScreen.current === GameScreen.SETUP) {
+            playerSetup.current.consumeInput(inputContent);
+            _setInputContent("");
+            if (playerSetup.current.isFinished()) {
+                setLogEntries([]);
+                game.current = new Game(log, error, playerSetup.current);
+                gameScreen.current = GameScreen.GAMEPLAY;
+            } else {
+                log(playerSetup.current.promptMessage());
+            }
+        } else if (gameScreen.current === GameScreen.GAMEPLAY && game.current !== null && inputContent.length > 0) {
+            const parsed = parseInput(inputContent.trim(), game.current);
+            if (parsed.type === ParseResponseType.RESULT) {
+                parsed.result.apply(game.current);
+            } else {
+                error(`Unknown command: ${inputContent}`);
+            }
+            _setInputContent("");
+            setSuggestion("");
+        }
+    }
+
+    function handleTab() {
+        if (gameScreen.current === GameScreen.GAMEPLAY && game.current !== null) {
             const parsed = parseInput(inputContent.trim(), game.current);
             if (parsed.type === ParseResponseType.SUGGESTIONS && parsed.options.length === 1) {
                 const option = parsed.options[0];
@@ -49,17 +93,6 @@ function App() {
                 _setInputContent(staticContent + option.name);
                 setSuggestion("");
             }
-            event.preventDefault();
-        } else if (event.key === "Enter" && inputContent.length > 0) {
-            const parsed = parseInput(inputContent.trim(), game.current);
-            if (parsed.type === ParseResponseType.RESULT) {
-                parsed.result.apply(game.current);
-            } else {
-                error(`Unknown command: ${inputContent}`);
-            }
-            setTextInputContext("");
-            setSuggestion("");
-            event.preventDefault();
         }
     }
 
@@ -71,7 +104,7 @@ function App() {
             <InputBox 
                 value={inputContent} 
                 suggestion={suggestion}
-                setValue={setTextInputContext}
+                setValue={setInputContent}
                 keyDown={keyDown}/>
         </>
     );

@@ -1,4 +1,5 @@
 //import Direction from "./direction";
+import PlayerConfig from "./playerConfig";
 
 class Player {
     //a player should have
@@ -14,8 +15,8 @@ class Player {
 
     //equipped weapons or items (like 4 slots)
     //private equipSlots: Slot;
-    constructor(){
-        this.name = "Link";
+    constructor(config: PlayerConfig){
+        this.name = config.name;
         this.health = 10;
         this.maxHealth = 10;
     }
