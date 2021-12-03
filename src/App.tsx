@@ -70,6 +70,7 @@ function App() {
             <div id="input-container">
                 <span id="caret">&gt;</span>
                 <input 
+                    autoFocus
                     id="input-box"
                     value={textInputContent}
                     onInput={e => setTextInputContext(e.currentTarget.value)}
