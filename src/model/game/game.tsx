@@ -1,6 +1,6 @@
-import Direction from "./userinput/direction";
+import Direction from "../userinput/direction";
 import Player from "./player";
-import PlayerConfig from "./playerConfig";
+import PlayerConfig from "../playerConfig";
 
 class Game {
     private readonly writeLog: (entry: string) => void;

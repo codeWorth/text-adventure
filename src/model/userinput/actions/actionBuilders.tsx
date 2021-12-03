@@ -1,4 +1,4 @@
-import Game from "../../game";
+import Game from "../../game/game";
 import Option from "../option";
 import ActionBuilder from "./actionBuilder";
 import Direction from "../direction";

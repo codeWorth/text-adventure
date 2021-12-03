@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import './App.css';
-import Game from './model/game';
+import Game from './model/game/game';
 import PlayerConfig from './model/playerConfig';
 import { parseInput, ParseResponseType } from './model/userinput/input';
 import useStateRef from './useStateRef';
