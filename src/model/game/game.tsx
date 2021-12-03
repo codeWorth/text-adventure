@@ -22,6 +22,7 @@ class Game {
         const rooms: Rooms = makeRooms(); 
         this.rooms = rooms.rooms;
         this.currentRoom = rooms.startRoom;
+        this.enter(rooms.startRoom);
     }
 
     getCurrentRoom(): Room {
@@ -38,6 +39,11 @@ class Game {
 
     error(message: string) {
         this.writeError(message);
+    }
+
+    private enter(room: Room) {
+        this.log(`You are in ${room.getName()}`);
+        this.currentRoom = room;
     }
 };
 
