@@ -1,38 +1,72 @@
-.App {
-  text-align: center;
+input {
+    font-family: "Lucida Console", "Courier New", monospace;
+    font-size: 20pt;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+span {
+    font-family: "Lucida Console", "Courier New", monospace;
+    font-size: 20pt;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+#history {
+    width: 800px;
+    height: 600px;
+    padding: 8px;
+    background-color: rgba(255, 255, 255, 0.03);
+    border-radius: 4px;
+    overflow-y: auto;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+#input-container {
+    position: relative;
+    margin-top: 16px;
+    width: 800px;
+    height: 60px;
 }
 
-.App-link {
-  color: #61dafb;
+#input-box {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    z-index: 1;
+
+    width: 100%;
+    padding: 8px;
+    background-color: white;
+    color: black;
+    border-radius: 4px;
+    outline: 0px solid transparent;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+#input-box.focused {
+    -webkit-box-shadow: 0px 0px 3px 3px rgba(255,255,255,0.5); 
+    box-shadow: 0px 0px 3px 3px rgba(255,255,255,0.5);
+}
+
+#suggestion-container {
+    top: 9.8px;
+    left: 9.7px;
+    position: absolute;
+    z-index: 2;
+    pointer-events: none;
+}
+
+#calcWidth {
+    color: rgba(0, 0, 0, 0);
+    pointer-events: none;
+}
+
+#suggestion {
+    color: rgb(160, 160, 160);
+    pointer-events: none;
+}
+
+.history-entry {
+    width: 100%;
+    word-wrap: break-word;
+    margin-bottom: 8px;
 }
