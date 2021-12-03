@@ -6,7 +6,6 @@ import useStateRef from './useStateRef';
 
 function App() {
     const textInput = useRef<HTMLInputElement>(null);
-    const [inputFocused, setInputFocused] = useState(false);
     const [textInputContent, _setTextInputContent] = useState("");
     const [suggestion, setSuggestion] = useState("");
     const [historyEntries, setHistoryEntries, historyEntriesRef] = useStateRef<string[]>([]);
@@ -61,7 +60,7 @@ function App() {
     }
 
     return (
-        <div id="container">
+        <>
             <div id="history">
                 {historyEntries.map((entry, index) => 
                     <div className="history-entry" key={index}>{entry}</div>)
@@ -69,14 +68,12 @@ function App() {
                 <div ref={scrollDiv}></div>
             </div>
             <div id="input-container">
+                <span id="caret">&gt;</span>
                 <input 
                     id="input-box"
                     value={textInputContent}
                     onInput={e => setTextInputContext(e.currentTarget.value)}
-                    className={inputFocused ? "focused" : ""}
                     onClick={() => textInput.current?.focus()}
-                    onFocus={() => setInputFocused(true)}
-                    onBlur={() => setInputFocused(false)}
                     onKeyDown={keyDown}
                     spellCheck={false}/>
                 <div id="suggestion-container">
@@ -84,7 +81,7 @@ function App() {
                     <span  id="suggestion" spellCheck={false}>{suggestion}</span>
                 </div>
             </div>
-        </div>
+        </>
     );
 }
 
