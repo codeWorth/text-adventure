@@ -2,9 +2,4 @@ html, body {
     margin: 0px;
     padding: 4px;
     background-color: black;
-    color: #fcfcfc;
-    font-family: "Lucida Console", "Courier New", monospace;
-    font-size: 12pt;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
 }

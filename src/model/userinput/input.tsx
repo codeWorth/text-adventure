@@ -1,6 +1,6 @@
 import ActionBuilder from './actions/actionBuilder';
 import { BaseBuilder } from './actions/actionBuilders';
-import Game from './game';
+import Game from '../game';
 import Option from './option';
 
 const baseBuilder = new BaseBuilder();

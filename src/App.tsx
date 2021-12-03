@@ -1,30 +1,34 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import './App.css';
 import Game from './model/game';
-import { parseInput, ParseResponseType } from './model/input';
+import { parseInput, ParseResponseType } from './model/userinput/input';
 import useStateRef from './useStateRef';
+import InputBox from './view/inputBox';
+import Log from './view/log';
 
 function App() {
-    const textInput = useRef<HTMLInputElement>(null);
-    const [textInputContent, _setTextInputContent] = useState("");
+    const [inputContent, _setInputContent] = useState("");
     const [suggestion, setSuggestion] = useState("");
-    const [historyEntries, setHistoryEntries, historyEntriesRef] = useStateRef<string[]>([]);
-    const scrollDiv = useRef<HTMLDivElement>(null);
+    const [logEntries, setLogEntries, logEntriesRef] = useStateRef<string[]>([]);
+    const [errorMessage, setErrorMessage] = useState("");
 
-    const game = useRef(new Game(addHistoryEntry));
+    const game = useRef(new Game(log, error));
 
-    useEffect(() => scrollDiv.current?.scrollIntoView({behavior: "smooth"}), [historyEntries]);
-
-    function addHistoryEntry(entry: string) {
-        if (historyEntriesRef.current) {
-            setHistoryEntries([...historyEntriesRef.current, entry]);
+    function log(message: string) {
+        setErrorMessage("");
+        if (logEntriesRef.current) {
+            setLogEntries([...logEntriesRef.current, message]);
         } else {
-            setHistoryEntries([entry]);
+            setLogEntries([message]);
         }
     }
 
+    function error(message: string) {
+        setErrorMessage(message);
+    }
+
     function setTextInputContext(content: string) {
-        if (content !== textInputContent) {
+        if (content !== inputContent) {
             const parsed = parseInput(content.trim(), game.current);
             if (parsed.type === ParseResponseType.SUGGESTIONS && parsed.options.length === 1) {
                 const option = parsed.options[0];
@@ -33,25 +37,25 @@ function App() {
                 setSuggestion("");
             }
         }
-        _setTextInputContent(content);
+        _setInputContent(content);
     }
 
     function keyDown(event: React.KeyboardEvent<HTMLInputElement>) {
         if (event.key === "Tab") {
-            const parsed = parseInput(textInputContent.trim(), game.current);
+            const parsed = parseInput(inputContent.trim(), game.current);
             if (parsed.type === ParseResponseType.SUGGESTIONS && parsed.options.length === 1) {
                 const option = parsed.options[0];
-                const staticContent = textInputContent.substring(0, textInputContent.length - option.consumed);
-                _setTextInputContent(staticContent + option.name);
+                const staticContent = inputContent.substring(0, inputContent.length - option.consumed);
+                _setInputContent(staticContent + option.name);
                 setSuggestion("");
             }
             event.preventDefault();
-        } else if (event.key === "Enter" && textInputContent.length > 0) {
-            const parsed = parseInput(textInputContent.trim(), game.current);
+        } else if (event.key === "Enter" && inputContent.length > 0) {
+            const parsed = parseInput(inputContent.trim(), game.current);
             if (parsed.type === ParseResponseType.RESULT) {
                 parsed.result.apply(game.current);
             } else {
-                addHistoryEntry(`Unknown command: ${textInputContent}`);
+                error(`Unknown command: ${inputContent}`);
             }
             setTextInputContext("");
             setSuggestion("");
@@ -61,27 +65,14 @@ function App() {
 
     return (
         <>
-            <div id="history">
-                {historyEntries.map((entry, index) => 
-                    <div className="history-entry" key={index}>{entry}</div>)
-                }
-                <div ref={scrollDiv}></div>
-            </div>
-            <div id="input-container">
-                <span id="caret">&gt;</span>
-                <input 
-                    autoFocus
-                    id="input-box"
-                    value={textInputContent}
-                    onInput={e => setTextInputContext(e.currentTarget.value)}
-                    onClick={() => textInput.current?.focus()}
-                    onKeyDown={keyDown}
-                    spellCheck={false}/>
-                <div id="suggestion-container">
-                    <span id="calcWidth">{textInputContent}</span>
-                    <span  id="suggestion" spellCheck={false}>{suggestion}</span>
-                </div>
-            </div>
+            <Log 
+                entries={logEntries}
+                errorMessage={errorMessage}/>
+            <InputBox 
+                value={inputContent} 
+                suggestion={suggestion}
+                setValue={setTextInputContext}
+                keyDown={keyDown}/>
         </>
     );
 }

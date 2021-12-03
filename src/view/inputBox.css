@@ -1,0 +1,46 @@
+#input-container {
+    position: relative;
+}
+
+#caret {
+    position: absolute;
+    top: 13px;
+    left: 13px;
+}
+
+#input-box {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    z-index: 1;
+
+    width: calc(800px - 20px);
+    padding: 12px;
+    padding-left: 32px;
+    background-color: white;
+    
+    outline: 0px solid transparent;
+    background-color: rgba(0, 0, 0, 0);
+    border: 1px solid white;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+}
+
+#suggestion-container {
+    padding: 13px;
+    padding-left: 33px;
+    position: absolute;
+    z-index: 2;
+    pointer-events: none;
+}
+
+#calcWidth {
+    color: rgba(0, 0, 0, 0);
+    pointer-events: none;
+}
+
+#suggestion {
+    color: rgb(160, 160, 160);
+    pointer-events: none;
+}

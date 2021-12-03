@@ -1,22 +1,28 @@
-import Direction from "./direction";
+import Direction from "./userinput/direction";
 
 class Game {
-    private readonly addHistoryEntry: (entry: string) => void;
+    private readonly writeLog: (entry: string) => void;
+    private readonly writeError: (entry: string) => void;
 
-    constructor(addHistoryEntry: (entries: string) => void) {
-        this.addHistoryEntry = addHistoryEntry;
+    constructor(writeLog: (entries: string) => void, writeError: (entries: string) => void) {
+        this.writeLog = writeLog;
+        this.writeError = writeError;
     }
 
     go(direction: Direction) {
-        this.addHistoryEntry(`going ${direction}`);
+        this.writeLog(`going ${direction}`);
     }
 
     look() {
-        this.addHistoryEntry(`looking around`);
+        this.writeLog(`looking around`);
     }
 
     log(message: string) {
-        this.addHistoryEntry(message);
+        this.writeLog(message);
+    }
+
+    error(message: string) {
+        this.writeError(message);
     }
 };
 

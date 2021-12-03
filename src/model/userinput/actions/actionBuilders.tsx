@@ -1,4 +1,4 @@
-import Game from "../game";
+import Game from "../../game";
 import Option from "../option";
 import ActionBuilder from "./actionBuilder";
 import Direction from "../direction";
@@ -12,7 +12,7 @@ class BaseBuilder implements ActionBuilder {
     }
 
     apply(game: Game) {
-        game.log("THIS REALLY SHOULDN'T HAPPEN");
+        game.error("THIS REALLY SHOULDN'T HAPPEN");
     }
 }
 
@@ -27,7 +27,7 @@ class GoBuilder implements ActionBuilder {
     }
 
     apply(game: Game) {
-        game.log("You must specify the direction to go.");
+        game.error("You must specify the direction to go.");
     }
 }
 
@@ -65,7 +65,7 @@ class LookAt implements ActionBuilder {
     }
 
     apply(game: Game) {
-        game.log("You must specify what to look at.");
+        game.error("You must specify what to look at.");
     }
 }
 

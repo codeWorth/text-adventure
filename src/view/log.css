@@ -1,0 +1,14 @@
+#history {
+    width: 800px;
+    height: 600px;
+    padding: 12px;
+    background-color: rgba(255, 255, 255, 0.03);
+    border: 1px solid white;
+    overflow-y: auto;
+}
+
+.history-entry {
+    width: 100%;
+    word-wrap: break-word;
+    margin-bottom: 8px;
+}
