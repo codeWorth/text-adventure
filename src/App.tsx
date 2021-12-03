@@ -40,7 +40,7 @@ function App() {
 
     function setInputContent(content: string) {
         if (content !== inputContent && gameScreen.current === GameScreen.GAMEPLAY && game.current !== null) {
-            const parsed = parseInput(content.trim(), game.current);
+            const parsed = parseCurrentInput(content, game.current);
             if (parsed.type === ParseResponseType.SUGGESTIONS && parsed.options.length === 1) {
                 const option = parsed.options[0];
                 setSuggestion(option.name.substring(option.consumed));
@@ -53,17 +53,17 @@ function App() {
 
     function keyDown(event: React.KeyboardEvent<HTMLInputElement>) {
         if (event.key === "Tab") {
-            handleTab();
+            handleTab(inputContent);
             event.preventDefault();
         } else if (event.key === "Enter") {
-            handleEnter();
+            handleEnter(inputContent);
             event.preventDefault();
         }
     }
 
-    function handleEnter() {
+    function handleEnter(message: string) {
         if (gameScreen.current === GameScreen.SETUP) {
-            playerSetup.current.consumeInput(inputContent);
+            playerSetup.current.consumeInput(message);
             _setInputContent("");
             if (playerSetup.current.isFinished()) {
                 setLogEntries([]);
@@ -72,28 +72,32 @@ function App() {
             } else {
                 log(playerSetup.current.promptMessage());
             }
-        } else if (gameScreen.current === GameScreen.GAMEPLAY && game.current !== null && inputContent.length > 0) {
-            const parsed = parseInput(inputContent.trim(), game.current);
+        } else if (gameScreen.current === GameScreen.GAMEPLAY && game.current !== null) {
+            const parsed = parseCurrentInput(message, game.current);
             if (parsed.type === ParseResponseType.RESULT) {
                 parsed.result.apply(game.current);
             } else {
-                error(`Unknown command: ${inputContent}`);
+                error(`Unknown command: ${message}`);
             }
             _setInputContent("");
             setSuggestion("");
         }
     }
 
-    function handleTab() {
+    function handleTab(message: string) {
         if (gameScreen.current === GameScreen.GAMEPLAY && game.current !== null) {
-            const parsed = parseInput(inputContent.trim(), game.current);
+            const parsed = parseCurrentInput(message, game.current);
             if (parsed.type === ParseResponseType.SUGGESTIONS && parsed.options.length === 1) {
                 const option = parsed.options[0];
-                const staticContent = inputContent.substring(0, inputContent.length - option.consumed);
+                const staticContent = message.substring(0, message.length - option.consumed);
                 _setInputContent(staticContent + option.name);
                 setSuggestion("");
             }
         }
+    }
+
+    function parseCurrentInput(message: string, game: Game) {
+        return parseInput(message.trim(), game.getCurrentRoom().getActions(game));
     }
 
     return (

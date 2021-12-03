@@ -2,7 +2,7 @@ import Option from '../option';
 import Game from '../../game/game';
 
 interface ActionBuilder {
-    context(game: Game): Option[];
+    context(): Option[];
     apply(game: Game): void;
 }
 

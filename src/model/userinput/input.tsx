@@ -1,9 +1,5 @@
 import ActionBuilder from './actions/actionBuilder';
-import { BaseBuilder } from './actions/actionBuilders';
-import Game from '../game/game';
 import Option from './option';
-
-const baseBuilder = new BaseBuilder();
 
 enum ParseResponseType {
     SUGGESTIONS, RESULT
@@ -36,8 +32,8 @@ function exactPrefixMatch(str: string, prefix: string): boolean {
     return str.substring(0, prefix.length) === prefix;
 }
 
-function parseInput(input: string, game: Game, actionBuilder: ActionBuilder = baseBuilder): Suggestions | Result {
-    const context = actionBuilder.context(game);
+function parseInput(input: string, actionBuilder: ActionBuilder): Suggestions | Result {
+    const context = actionBuilder.context();
     input = input.toLowerCase();
     const matches = context.filter(option => exactPrefixMatch(input, option.name));
 
@@ -47,7 +43,7 @@ function parseInput(input: string, game: Game, actionBuilder: ActionBuilder = ba
         if (remainingInput.length === 0) {
             return new Result(match.actionBuilder);
         } else {
-            return parseInput(remainingInput, game, match.actionBuilder);
+            return parseInput(remainingInput, match.actionBuilder);
         }
     }
 

@@ -1,5 +1,5 @@
 //import Direction from "./direction";
-import PlayerConfig from "./playerConfig";
+import PlayerConfig from "../playerConfig";
 
 class Player {
     //a player should have

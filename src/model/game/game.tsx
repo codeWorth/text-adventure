@@ -1,11 +1,15 @@
 import Direction from "../userinput/direction";
 import Player from "./player";
 import PlayerConfig from "../playerConfig";
+import Room, { makeRooms, Rooms } from "./room";
 
 class Game {
+    public readonly player: Player;
+
     private readonly writeLog: (entry: string) => void;
     private readonly writeError: (entry: string) => void;
-    public readonly player: Player;
+    private rooms: Room[];
+    private currentRoom: Room;
 
     constructor(
         writeLog: (entries: string) => void, 
@@ -15,14 +19,17 @@ class Game {
         this.writeLog = writeLog;
         this.writeError = writeError;
         this.player = new Player(playerConfig);
+        const rooms: Rooms = makeRooms(); 
+        this.rooms = rooms.rooms;
+        this.currentRoom = rooms.startRoom;
+    }
+
+    getCurrentRoom(): Room {
+        return this.currentRoom;
     }
 
     go(direction: Direction) {
-        this.writeLog(`going ${direction}`);
-    }
-
-    look() {
-        this.writeLog(`looking around`);
+        this.writeLog(`Going ${direction}...`);
     }
 
     log(message: string) {
