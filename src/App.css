@@ -1,13 +1,13 @@
 input {
     font-family: "Lucida Console", "Courier New", monospace;
-    font-size: 20pt;
+    font-size: 12pt;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
 
 span {
     font-family: "Lucida Console", "Courier New", monospace;
-    font-size: 20pt;
+    font-size: 12pt;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
@@ -15,7 +15,7 @@ span {
 #history {
     width: 800px;
     height: 600px;
-    padding: 8px;
+    padding: 16px;
     background-color: rgba(255, 255, 255, 0.03);
     border-radius: 4px;
     overflow-y: auto;

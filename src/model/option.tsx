@@ -1,4 +1,4 @@
-import { ActionBuilder } from "./actions/actionBuilder";
+import ActionBuilder from "./actions/actionBuilder";
 
 class Option {
     public readonly name: string;

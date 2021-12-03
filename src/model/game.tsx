@@ -14,6 +14,10 @@ class Game {
     look() {
         this.addHistoryEntry(`looking around`);
     }
+
+    log(message: string) {
+        this.addHistoryEntry(message);
+    }
 };
 
 export default Game;

@@ -1,19 +1,22 @@
 import Game from "../game";
 import Option from "../option";
-import { ActionBuilder } from "./actionBuilder";
-import Action from './action';
+import ActionBuilder from "./actionBuilder";
 import Direction from "../direction";
 
-class BaseBuilder extends ActionBuilder {
+class BaseBuilder implements ActionBuilder {
     context(game: Game): Option[] {
         return [
             Option.forAction("go", new GoBuilder()),
             Option.forAction("look", new LookBuilder())
         ];
     }
+
+    apply(game: Game) {
+        game.log("THIS REALLY SHOULDN'T HAPPEN");
+    }
 }
 
-class GoBuilder extends ActionBuilder {
+class GoBuilder implements ActionBuilder {
     context(game: Game): Option[] {
         return [
             Option.forAction(" north", new GoFinished(Direction.NOTRTH)), 
@@ -22,13 +25,16 @@ class GoBuilder extends ActionBuilder {
             Option.forAction(" west", new GoFinished(Direction.WEST))
         ];
     }
+
+    apply(game: Game) {
+        game.log("You must specify the direction to go.");
+    }
 }
 
-class GoFinished extends ActionBuilder implements Action {
+class GoFinished implements ActionBuilder {
     readonly direction: Direction;
 
     constructor(direction: Direction) {
-        super();
         this.direction = direction;
     }
 
@@ -36,22 +42,30 @@ class GoFinished extends ActionBuilder implements Action {
         return [];
     }
 
-    build(): Action {
-        return this;
-    }
-
     apply(game: Game) {
         game.go(this.direction);
     }
 }
 
-class LookBuilder extends ActionBuilder implements Action {
+class LookBuilder implements ActionBuilder {
+    context(game: Game): Option[] {
+        return [
+            Option.forAction(" at", new LookAt())
+        ];
+    }
+
+    apply(game: Game) {
+        game.look();
+    }
+}
+
+class LookAt implements ActionBuilder {
     context(game: Game): Option[] {
         return [];
     }
 
     apply(game: Game) {
-        game.look();
+        game.log("You must specify what to look at.");
     }
 }
 

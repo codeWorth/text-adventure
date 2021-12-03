@@ -1,10 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import './App.css';
-import { NO_ACTION } from './model/actions/actionBuilder';
 import Game from './model/game';
-import parseInput from './model/input';
-import Option from './model/option';
-import Action from './model/actions/action';
+import { parseInput, ParseResponseType } from './model/input';
 import useStateRef from './useStateRef';
 
 function App() {
@@ -16,7 +13,6 @@ function App() {
     const scrollDiv = useRef<HTMLDivElement>(null);
 
     const game = useRef(new Game(addHistoryEntry));
-    const option = useRef<Option | null>(null);
 
     useEffect(() => scrollDiv.current?.scrollIntoView({behavior: "smooth"}), [historyEntries]);
 
@@ -30,12 +26,11 @@ function App() {
 
     function setTextInputContext(content: string) {
         if (content !== textInputContent) {
-            const options = parseInput(content, game.current);
-            if (options.length === 1) {
-                option.current = options[0];
-                setSuggestion(option.current.name.substring(option.current.consumed));
+            const parsed = parseInput(content.trim(), game.current);
+            if (parsed.type === ParseResponseType.SUGGESTIONS && parsed.options.length === 1) {
+                const option = parsed.options[0];
+                setSuggestion(option.name.substring(option.consumed));
             } else {
-                option.current = null;
                 setSuggestion("");
             }
         }
@@ -44,16 +39,18 @@ function App() {
 
     function keyDown(event: React.KeyboardEvent<HTMLInputElement>) {
         if (event.key === "Tab") {
-            if (option.current !== null) {
-                const staticContent = textInputContent.substring(0, textInputContent.length - option.current.consumed);
-                _setTextInputContent(staticContent + option.current.name);
+            const parsed = parseInput(textInputContent.trim(), game.current);
+            if (parsed.type === ParseResponseType.SUGGESTIONS && parsed.options.length === 1) {
+                const option = parsed.options[0];
+                const staticContent = textInputContent.substring(0, textInputContent.length - option.consumed);
+                _setTextInputContent(staticContent + option.name);
                 setSuggestion("");
             }
             event.preventDefault();
         } else if (event.key === "Enter" && textInputContent.length > 0) {
-            const action: Action | undefined = option.current?.actionBuilder.build();
-            if (action !== undefined && action !== NO_ACTION) {
-                action.apply(game.current);
+            const parsed = parseInput(textInputContent.trim(), game.current);
+            if (parsed.type === ParseResponseType.RESULT) {
+                parsed.result.apply(game.current);
             } else {
                 addHistoryEntry(`Unknown command: ${textInputContent}`);
             }
@@ -64,7 +61,7 @@ function App() {
     }
 
     return (
-        <>
+        <div id="container">
             <div id="history">
                 {historyEntries.map((entry, index) => 
                     <div className="history-entry" key={index}>{entry}</div>)
@@ -87,7 +84,7 @@ function App() {
                     <span  id="suggestion" spellCheck={false}>{suggestion}</span>
                 </div>
             </div>
-        </>
+        </div>
     );
 }
 
