@@ -1,5 +1,6 @@
+import { nonNull } from "../../../util";
 import ActionBuilder from "../../userinput/actions/actionBuilder";
-import PureAction from "../../userinput/actions/pureAction";
+import ActionStart from "../../userinput/actions/actionStart";
 import Game from "../game";
 import Room from "../room";
 import Connections from "./connections";
@@ -17,7 +18,9 @@ class EnemyRoom implements Room {
     }
 
     getActions(game: Game): ActionBuilder {
-        return new PureAction(() => null);
+        return new ActionStart(...nonNull(
+            this.connections.getGoOption()
+        ));
     }
     
     getConnections() {

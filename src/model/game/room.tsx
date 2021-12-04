@@ -3,6 +3,7 @@ import Direction, { oppositeDirection } from '../userinput/direction';
 import Game from './game';
 import Connection from './rooms/connection';
 import Connections from './rooms/connections';
+import EnemyRoom from './rooms/enemyRoom';
 import RiddleRoom from './rooms/riddleRoom';
 import StartRoom from './rooms/startRoom';
 
@@ -20,8 +21,10 @@ export type Rooms = {
 export function makeRooms(): Rooms {
     const startRoom = new StartRoom();
     const riddleRoom = new RiddleRoom();
+    const enemyRoom = new EnemyRoom();
 
     connect(startRoom, Direction.EAST, riddleRoom);
+    connect(startRoom, Direction.NOTRTH, enemyRoom);
 
     return {startRoom: startRoom, rooms: [startRoom, riddleRoom]};
 }
