@@ -1,3 +1,4 @@
+import { map, nonNull } from "../../../util";
 import ActionBuilder from "../../userinput/actions/actionBuilder";
 import { CombinedApplyBuilder } from "../../userinput/actions/combinedBuilders";
 import LogAction from "../../userinput/actions/logAction";
@@ -15,12 +16,14 @@ enum ItemState {
 type ItemEntry = {
     item: Item,
     state: ItemState,
-    lookMessage: string
+    lookMessage: string,
+    pickupMessage?: string
 };
 
 export type ItemInfo = {
     item: Item,
-    lookMessage: string
+    lookMessage: string,
+    pickupMessage?: string
 };
 
 class TakeableItems {
@@ -30,7 +33,8 @@ class TakeableItems {
         this.items = items.map(item => ({
             item: item.item,
             state: ItemState.UNKNOWN,
-            lookMessage: item.lookMessage
+            lookMessage: item.lookMessage,
+            pickupMessage: item.pickupMessage 
         }));
     }
 
@@ -39,41 +43,40 @@ class TakeableItems {
         if (unknownItems.length > 0) {
             return new LookBuilder(lookMessage, new OptionsBuilder(
                 "You must specify what to look at.",
-                ...unknownItems.map(itemEntry => 
+                ...unknownItems.flatMap(itemEntry => itemEntry.item.pickupNames.map(name => 
                     Option.forAction(
-                        " " + itemEntry.item.name.toLowerCase(), 
+                        " " + name.toLowerCase(), 
                         new CombinedApplyBuilder(
                             new LogAction(itemEntry.lookMessage),
                             new PureAction(() => itemEntry.state = ItemState.KNOWN)
                         )
                     )
-                )
+                ))
             ));
         } else {
             return new LookBuilder(lookMessage);
         }
     }
 
-    getTakeBuilder(player: Player): ActionBuilder | null {
+    getTakeBuilder(player: Player): ActionBuilder | undefined {
         const knownItems = this.knownItems();
         if (knownItems.length > 0) {
             return new OptionsBuilder(
                 "You must specify which item to take.",
-                ...knownItems.map(itemEntry =>
+                ...knownItems.flatMap(itemEntry => itemEntry.item.pickupNames.map(name => 
                     Option.forAction(
-                        " " + itemEntry.item.name.toLowerCase(),
-                        new CombinedApplyBuilder(
+                        " " + name.toLowerCase(),
+                        new CombinedApplyBuilder(...nonNull<ActionBuilder>(
+                            map(itemEntry.pickupMessage, msg => new LogAction(msg)),
                             new LogAction(`You pick up the ${itemEntry.item.name}.`),
                             new PureAction(() => {
                                 itemEntry.state = ItemState.TAKEN;
                                 player.addItem(itemEntry.item);
                             })
-                        )
+                        ))
                     )
-                )
+                ))
             )
-        } else {
-            return null;
         }
     }
 

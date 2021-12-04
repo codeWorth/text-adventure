@@ -4,8 +4,9 @@ import ActionBuilder from "./actionBuilder";
 export class CombinedContextBuilder implements ActionBuilder {
     protected readonly actionBuilders: ActionBuilder[];
 
-    constructor(applyAction: ActionBuilder, ...actionBuilders: ActionBuilder[]) {
-        this.actionBuilders = [applyAction, ...actionBuilders];
+    constructor(...actionBuilders: ActionBuilder[]) {
+        console.assert(actionBuilders.length > 0);
+        this.actionBuilders = [...actionBuilders];
     }
 
     context() {

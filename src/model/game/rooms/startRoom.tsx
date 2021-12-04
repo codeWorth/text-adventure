@@ -1,3 +1,4 @@
+import { map, nonNull } from "../../../util";
 import ActionBuilder from "../../userinput/actions/actionBuilder";
 import ActionStart from "../../userinput/actions/actionStart";
 import { GoBuilder } from "../../userinput/actions/goBuilders";
@@ -15,7 +16,7 @@ class StartRoom implements Room {
     constructor() {
         this.takeableItems = new TakeableItems(
             {
-                item: new Item("Torch"),
+                item: new Item("Mysterious Torch", "torch"),
                 lookMessage: "The torch is affixed to the wall with a sturdy iron bracket. Looking closely at the flame, it doesn't seem to burning from some fuel source. Instead, the flame simply hovers in the basin of the torch."
             }
         );
@@ -26,20 +27,14 @@ class StartRoom implements Room {
     }
 
     getActions(game: Game): ActionBuilder {
-        const options: Option[] = [
+        return new ActionStart(...nonNull(
             Option.forAction("go", new GoBuilder(Direction.EAST, Direction.SOUTH)),
             Option.forAction("look", this.takeableItems.getLookBuilder(
                 "There is a single torch on the wall, dimly illuminating the stone walls.",
                 game.player
-            ))
-        ];
-
-        const takeBuilder = this.takeableItems.getTakeBuilder(game.player);
-        if (takeBuilder) {
-            options.push(Option.forAction("take", takeBuilder));
-        }
-
-        return new ActionStart(...options);
+            )),
+            map(this.takeableItems.getTakeBuilder(game.player), builder => Option.forAction("take", builder))
+        ));
     }
 }
 
