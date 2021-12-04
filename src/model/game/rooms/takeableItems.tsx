@@ -2,8 +2,6 @@ import { map, nonNull } from "../../../util";
 import ActionBuilder from "../../userinput/actions/actionBuilder";
 import { CombinedApplyBuilder } from "../../userinput/actions/combinedBuilders";
 import LogAction from "../../userinput/actions/logAction";
-import LookBuilder from "../../userinput/actions/lookBuilder";
-import OptionsBuilder from "../../userinput/actions/optionsBuilder";
 import PureAction from "../../userinput/actions/pureAction";
 import Option from "../../userinput/option";
 import Item from "../item";
@@ -38,46 +36,44 @@ class TakeableItems {
         }));
     }
 
-    getLookBuilder(lookMessage: string, player: Player): ActionBuilder {
-        const unknownItems = this.unknownItems();
-        if (unknownItems.length > 0) {
-            return new LookBuilder(lookMessage, new OptionsBuilder(
-                "You must specify what to look at.",
-                ...unknownItems.flatMap(itemEntry => itemEntry.item.pickupNames.map(name => 
-                    Option.forAction(
-                        " " + name.toLowerCase(), 
-                        new CombinedApplyBuilder(
-                            new LogAction(itemEntry.lookMessage),
-                            new PureAction(() => itemEntry.state = ItemState.KNOWN)
-                        )
-                    )
-                ))
-            ));
-        } else {
-            return new LookBuilder(lookMessage);
-        }
+    addKnownItem(item: Item, lookMessage: string, pickupMessage?: string) {
+        this.items.push({
+            item: item,
+            state: ItemState.KNOWN,
+            lookMessage: lookMessage,
+            pickupMessage: pickupMessage
+        });
     }
 
-    getTakeBuilder(player: Player): ActionBuilder | undefined {
-        const knownItems = this.knownItems();
-        if (knownItems.length > 0) {
-            return new OptionsBuilder(
-                "You must specify which item to take.",
-                ...knownItems.flatMap(itemEntry => itemEntry.item.pickupNames.map(name => 
-                    Option.forAction(
-                        " " + name.toLowerCase(),
-                        new CombinedApplyBuilder(...nonNull<ActionBuilder>(
-                            map(itemEntry.pickupMessage, msg => new LogAction(msg)),
-                            new LogAction(`You pick up the ${itemEntry.item.name}.`),
-                            new PureAction(() => {
-                                itemEntry.state = ItemState.TAKEN;
-                                player.addItem(itemEntry.item);
-                            })
-                        ))
-                    )
-                ))
+    getLookAtOptions(player: Player): Option[] {
+        const presentItems = this.presentItems();
+        return presentItems.flatMap(itemEntry => itemEntry.item.pickupNames.map(name => 
+            Option.forAction(
+                " " + name.toLowerCase(), 
+                new CombinedApplyBuilder(
+                    new LogAction(itemEntry.lookMessage),
+                    new PureAction(() => itemEntry.state = ItemState.KNOWN)
+                )
             )
-        }
+        ));
+    }
+
+    getTakeOptions(player: Player): Option[] {
+        return this.knownItems().flatMap(itemEntry => 
+            itemEntry.item.pickupNames.map(name => 
+                Option.forAction(
+                    " " + name.toLowerCase(),
+                    new CombinedApplyBuilder(...nonNull<ActionBuilder>(
+                        map(itemEntry.pickupMessage, msg => new LogAction(msg)),
+                        new LogAction(`You pick up the ${itemEntry.item.name}.`),
+                        new PureAction(() => {
+                            itemEntry.state = ItemState.TAKEN;
+                            player.addItem(itemEntry.item);
+                        })
+                    ))
+                )
+            )
+        );
     }
 
     knownItems(): ItemEntry[] {
@@ -85,9 +81,9 @@ class TakeableItems {
             .filter(item => item.state === ItemState.KNOWN);
     }
 
-    unknownItems(): ItemEntry[] {
+    presentItems(): ItemEntry[] {
         return this.items
-            .filter(item => item.state === ItemState.UNKNOWN);
+            .filter(item => item.state !== ItemState.TAKEN);
     }
 };
 

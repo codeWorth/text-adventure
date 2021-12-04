@@ -1,13 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
 import './App.css';
-import Game from './model/game/game';
-import PlayerConfig from './model/playerConfig';
-import ActionBuilder from './model/userinput/actions/actionBuilder';
-import { CombinedContextBuilder } from './model/userinput/actions/combinedBuilders';
-import { parseInput, ParseResponseType } from './model/userinput/input';
-import useStateRef from './useStateRef';
+import { useEffect, useRef, useState } from 'react';
 import InputBox from './view/inputBox';
 import Log from './view/log';
+import Game from './model/game/game';
+import PlayerConfig from './model/playerConfig';
+import { parseInput, ParseResponseType } from './model/userinput/input';
+import useStateRef from './useStateRef';
 
 enum GameScreen {
     SETUP, GAMEPLAY
@@ -22,7 +20,6 @@ function App() {
     const gameScreen = useRef(GameScreen.SETUP);
     const playerSetup = useRef(new PlayerConfig());
     const game = useRef<Game | null>(null);
-    const allActions = useRef<CombinedContextBuilder | null>(null);
 
     useEffect(() => {
         log(playerSetup.current.promptMessage());
@@ -42,16 +39,20 @@ function App() {
     }
 
     function setInputContent(content: string) {
-        if (content !== inputContent && gameScreen.current === GameScreen.GAMEPLAY && game.current !== null && allActions.current !== null) {
-            const parsed = parseCurrentInput(content, allActions.current);
-            if (parsed.type === ParseResponseType.SUGGESTIONS && parsed.options.length === 1) {
-                const option = parsed.options[0];
-                setSuggestion(option.name.substring(option.consumed));
-            } else {
-                setSuggestion("");
-            }
-        }
         _setInputContent(content);
+
+        if (content === inputContent) return;
+        if (gameScreen.current !== GameScreen.GAMEPLAY) return;
+        if (game.current === null) return;
+        if (game.current.getCachedActions() === null) return;
+
+        const parsed = parseInput(content.trim(), game.current.getCachedActions());
+        if (parsed.type === ParseResponseType.SUGGESTIONS && parsed.options.length === 1) {
+            const option = parsed.options[0];
+            setSuggestion(option.name.substring(option.consumed));
+        } else {
+            setSuggestion("");
+        }
     }
 
     function keyDown(event: React.KeyboardEvent<HTMLInputElement>) {
@@ -72,37 +73,28 @@ function App() {
                 setLogEntries([]);
                 game.current = new Game(log, error, playerSetup.current);
                 gameScreen.current = GameScreen.GAMEPLAY;
-                allActions.current = new CombinedContextBuilder(game.current.player.getActions(), game.current.getCurrentRoom().getActions(game.current));
             } else {
                 log(playerSetup.current.promptMessage());
             }
-        } else if (gameScreen.current === GameScreen.GAMEPLAY && game.current !== null && allActions.current !== null) {
-            const parsed = parseCurrentInput(message, allActions.current);
-            if (parsed.type === ParseResponseType.RESULT) {
-                parsed.result.apply(game.current);
-            } else {
-                error(`Unknown command: ${message}`);
-            }
-            allActions.current = new CombinedContextBuilder(game.current.player.getActions(), game.current.getCurrentRoom().getActions(game.current));
+        } else if (gameScreen.current === GameScreen.GAMEPLAY && game.current !== null) {
+            game.current.handleInput(message.trim());
             _setInputContent("");
             setSuggestion("");
         }
     }
 
     function handleTab(message: string) {
-        if (gameScreen.current === GameScreen.GAMEPLAY && game.current !== null && allActions.current !== null) {
-            const parsed = parseCurrentInput(message, allActions.current);
-            if (parsed.type === ParseResponseType.SUGGESTIONS && parsed.options.length === 1) {
-                const option = parsed.options[0];
-                const staticContent = message.substring(0, message.length - option.consumed);
-                _setInputContent(staticContent + option.name);
-                setSuggestion("");
-            }
-        }
-    }
+        if (gameScreen.current !== GameScreen.GAMEPLAY) return;
+        if (game.current === null) return;
+        if (game.current.getCachedActions() === null) return;
 
-    function parseCurrentInput(message: string, actions: ActionBuilder) {
-        return parseInput(message.trim(), actions);
+        const parsed = parseInput(message.trim(), game.current.getCachedActions());
+        if (parsed.type === ParseResponseType.SUGGESTIONS && parsed.options.length === 1) {
+            const option = parsed.options[0];
+            const staticContent = message.substring(0, message.length - option.consumed);
+            _setInputContent(staticContent + option.name);
+            setSuggestion("");
+        }
     }
 
     return (
