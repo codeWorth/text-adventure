@@ -10,6 +10,6 @@
 .history-entry {
     width: 100%;
     word-wrap: break-word;
-    margin-bottom: 8px;
-    white-space: pre;
+    margin-bottom: 16px;
+    white-space: pre-wrap;
 }

@@ -1,11 +1,12 @@
+import ActionBuilder from "../../userinput/actions/actionBuilder";
 import { CombinedApplyBuilder } from "../../userinput/actions/combinedBuilders";
 import LogAction from "../../userinput/actions/logAction";
-import { LookAt, LookBuilder } from "../../userinput/actions/lookBuilders";
+import LookBuilder from "../../userinput/actions/lookBuilder";
+import OptionsBuilder from "../../userinput/actions/optionsBuilder";
 import PureAction from "../../userinput/actions/pureAction";
-import TakeBuilder from "../../userinput/actions/takeBuilder";
 import Option from "../../userinput/option";
 import Item from "../item";
-import Room from "../room";
+import Player from "../player";
 
 enum ItemState {
     UNKNOWN, KNOWN, TAKEN
@@ -24,10 +25,8 @@ export type ItemInfo = {
 
 class TakeableItems {
     private readonly items: ItemEntry[];
-    private readonly room: Room;
 
-    constructor(room: Room, ...items: ItemInfo[]) {
-        this.room = room;
+    constructor(...items: ItemInfo[]) {
         this.items = items.map(item => ({
             item: item.item,
             state: ItemState.UNKNOWN,
@@ -35,36 +34,52 @@ class TakeableItems {
         }));
     }
 
-    getLookBuilder(lookMessage: string): LookBuilder {
+    getLookBuilder(lookMessage: string, player: Player): ActionBuilder {
         const unknownItems = this.unknownItems();
         if (unknownItems.length > 0) {
-            return new LookBuilder(lookMessage, new LookAt(...unknownItems.map(itemEntry => 
-                Option.forAction(
-                    " " + itemEntry.item.name.toLowerCase(), 
-                    new CombinedApplyBuilder(
-                        new LogAction(itemEntry.lookMessage),
-                        new PureAction(() => itemEntry.state = ItemState.KNOWN)
+            return new LookBuilder(lookMessage, new OptionsBuilder(
+                "You must specify what to look at.",
+                ...unknownItems.map(itemEntry => 
+                    Option.forAction(
+                        " " + itemEntry.item.name.toLowerCase(), 
+                        new CombinedApplyBuilder(
+                            new LogAction(itemEntry.lookMessage),
+                            new PureAction(() => itemEntry.state = ItemState.KNOWN)
+                        )
                     )
                 )
-            )));
+            ));
         } else {
             return new LookBuilder(lookMessage);
         }
     }
 
-    getTakeBuilder(): TakeBuilder | null {
+    getTakeBuilder(player: Player): ActionBuilder | null {
         const knownItems = this.knownItems();
         if (knownItems.length > 0) {
-            return new TakeBuilder(this.room, ...knownItems);
+            return new OptionsBuilder(
+                "You must specify which item to take.",
+                ...knownItems.map(itemEntry =>
+                    Option.forAction(
+                        " " + itemEntry.item.name.toLowerCase(),
+                        new CombinedApplyBuilder(
+                            new LogAction(`You pick up the ${itemEntry.item.name}.`),
+                            new PureAction(() => {
+                                itemEntry.state = ItemState.TAKEN;
+                                player.addItem(itemEntry.item);
+                            })
+                        )
+                    )
+                )
+            )
         } else {
             return null;
         }
     }
 
-    knownItems(): Item[] {
+    knownItems(): ItemEntry[] {
         return this.items
-            .filter(item => item.state === ItemState.KNOWN)
-            .map(item => item.item);
+            .filter(item => item.state === ItemState.KNOWN);
     }
 
     unknownItems(): ItemEntry[] {

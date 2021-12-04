@@ -2,7 +2,7 @@ import ActionBuilder from "./actionBuilder";
 import Game from "../../game/game";
 import Option from "../option";
 
-export class LookBuilder implements ActionBuilder {
+class LookBuilder implements ActionBuilder {
     private readonly message: string;
     private readonly lookAt?: ActionBuilder;
 
@@ -24,18 +24,4 @@ export class LookBuilder implements ActionBuilder {
     }
 }
 
-export class LookAt implements ActionBuilder {
-    private readonly visibles: Option[];
-
-    constructor(...visibles: Option[]) {
-        this.visibles = visibles;
-    }
-
-    context(): Option[] {
-        return this.visibles;
-    }
-
-    apply(game: Game) {
-        game.error("You must specify what to look at.");
-    }
-}
+export default LookBuilder;

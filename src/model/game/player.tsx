@@ -22,7 +22,7 @@ class Player {
         this.name = config.name;
         this.health = 10;
         this.maxHealth = 10;
-        this.inventory = [new Item("test item")];
+        this.inventory = [];
     }
     /*constructor(config: Config) {
         this.name = config.player.name;
