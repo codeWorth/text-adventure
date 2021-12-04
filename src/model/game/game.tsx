@@ -53,8 +53,19 @@ class Game {
         const connection = this.currentRoom.getConnections().getConnection(direction);
         if (!connection) return;
 
-        this.writeLog(`Going ${connection.direction}...`);
-        this.enter(connection.destination);
+        const key = connection.getKey();
+        if (key) {
+            if (this.player.hasKey(key)) {
+                this.writeLog(key.openMessage);
+                connection.unlock();
+
+            } else {
+                this.writeLog(key.lockedMessage);
+                return;
+            }
+        }
+        this.writeLog(`Going ${direction}...`);
+        this.enter(connection.getDestination(this.currentRoom));
     }
 
     log(message: string) {

@@ -19,7 +19,7 @@ class StartRoom implements Room {
         this.connections = new Connections(this);
         this.takeableItems = new TakeableItems(
             {
-                item: new Item("Mysterious Torch", "torch"),
+                item: new Item("Mysterious Torch", ["torch"]),
                 lookMessage: "The torch is affixed to the wall with a sturdy iron bracket. Looking closely at the flame, it doesn't seem to burning from some fuel source. Instead, the flame simply hovers in the basin of the torch.",
                 pickupMessage: "With a bit of effort, you're able to yank the torch out of its holder."
             }

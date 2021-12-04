@@ -20,9 +20,11 @@ class RiddleRoom implements Room, InputListener {
 
     private readonly takeableItems: TakeableItems = new TakeableItems();
     private readonly connections: Connections;
+    private readonly largeIronKey: Key;
 
-    constructor() {
+    constructor(largeIronKey: Key) {
         this.connections = new Connections(this);
+        this.largeIronKey = largeIronKey;
     }
 
     getName() {
@@ -62,10 +64,7 @@ class RiddleRoom implements Room, InputListener {
         if (message.toLowerCase() === "bro") {
             game.log("That is the correct answer.");
             game.log("A large iron key falls from the ceiling and hits you on the head.");
-            this.takeableItems.addKnownItem(
-                new Key("Large Iron Key", "key", "iron key"), 
-                "Surely this large iron key goes to a large iron door..."
-            );
+            this.takeableItems.addKnownItem(this.largeIronKey, "Surely this large iron key goes to a large iron door...");
         } else {
             game.log("That is not the correct answer.");
         }

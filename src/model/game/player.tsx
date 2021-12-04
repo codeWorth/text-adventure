@@ -3,6 +3,7 @@ import PlayerConfig from "../playerConfig";
 import PlayerAction from "../userinput/actions/playerActions";
 import Game from "./game";
 import Item from "./item";
+import Key from "./items/key";
 
 class Player {
     //a player should have
@@ -64,6 +65,10 @@ class Player {
             return false;
         }
         return true;
+    }
+
+    hasKey(key: Key): boolean {
+        return !!this.inventory.find(item => item === key);
     }
 
     addItem(item: Item) {

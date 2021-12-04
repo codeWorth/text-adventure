@@ -1,13 +1,8 @@
 import { GoBuilder } from "../../userinput/actions/goBuilders";
-import Direction, { oppositeDirection } from "../../userinput/direction";
+import Direction from "../../userinput/direction";
 import Option from "../../userinput/option";
 import Room from "../room";
 import Connection from "./connection";
-
-export type ConnectionView = {
-    direction: Direction,
-    destination: Room
-};
 
 class Connections {
     private connections: Map<Direction, Connection> = new Map();
@@ -18,20 +13,8 @@ class Connections {
         return Array.from(this.connections.keys());
     }
 
-    getConnection(direction: Direction): ConnectionView | undefined {
-        const connection = this.connections.get(direction);
-        if (!connection) return;
-        if (connection.roomA === this.room) {
-            return {
-                direction: direction,
-                destination: connection.roomB
-            };
-        } else if (connection.roomB === this.room) {
-            return {
-                direction: oppositeDirection(direction),
-                destination: connection.roomA
-            };
-        }
+    getConnection(direction: Direction): Connection | undefined {
+        return this.connections.get(direction);
     }
 
     addConnection(direction: Direction, connection: Connection) {
