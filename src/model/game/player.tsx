@@ -1,5 +1,8 @@
 //import Direction from "./direction";
 import PlayerConfig from "../playerConfig";
+import PlayerAction from "../userinput/actions/playerActions";
+import Game from "./game";
+import Item from "./item";
 
 class Player {
     //a player should have
@@ -11,7 +14,7 @@ class Player {
     private maxHealth: number;
 
     //an inventory
-    //private inventory: Inventory;
+    private inventory: Item[];
 
     //equipped weapons or items (like 4 slots)
     //private equipSlots: Slot;
@@ -19,6 +22,7 @@ class Player {
         this.name = config.name;
         this.health = 10;
         this.maxHealth = 10;
+        this.inventory = [new Item("test item")];
     }
     /*constructor(config: Config) {
         this.name = config.player.name;
@@ -30,12 +34,15 @@ class Player {
             this.maxHealth += amt;
         }
     }
+
     getHealthBar(): string{
         return `${this.health} / ${this.maxHealth}`;
     }
+
     getName(){
         return this.name;
     }
+
     damage(amt: number){
         if(amt > 0){
             this.health -= amt;
@@ -43,6 +50,7 @@ class Player {
                 this.health = 0;
         }
     }
+
     heal(amt: number){
         if(amt > 0){
             this.health += amt;
@@ -50,14 +58,31 @@ class Player {
                 this.health = this.maxHealth;
         }
     }
+
     isAlive(){
         if(this.health < 0){
             return false;
         }
         return true;
     }
-    printInventory(){
-        return `Name: ${this.name}\nHealth: ${this.getHealthBar()}\n\nItems: EMPTY\n`;
+
+    addItem(item: Item) {
+        this.inventory.push(item);
+    }
+
+    printInventory(game: Game){
+        const itemsStr = this.inventory.length === 0
+            ? "No items."
+            : this.inventory.map(item => "    - " + item.name).join("\n");
+        game.log(`Name: ${this.name}
+Health: ${this.getHealthBar()}
+
+Items: 
+${itemsStr}`);
+    }
+
+    getActions() {
+        return new PlayerAction();
     }
 };
 

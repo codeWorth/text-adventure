@@ -11,4 +11,5 @@
     width: 100%;
     word-wrap: break-word;
     margin-bottom: 8px;
+    white-space: pre;
 }
