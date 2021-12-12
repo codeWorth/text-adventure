@@ -1,6 +1,4 @@
 import { nonNull } from "../../../util";
-import ActionBuilder from "../../userinput/actions/actionBuilder";
-import ActionStart from "../../userinput/actions/actionStart";
 import { CombinedApplyBuilder } from "../../userinput/actions/combinedBuilders";
 import LogAction from "../../userinput/actions/logAction";
 import LookBuilder from "../../userinput/actions/lookBuilder";
@@ -10,33 +8,27 @@ import Option from "../../userinput/option";
 import Game, { InputListener } from "../game";
 import Key from "../items/key";
 import Room from "../room";
-import Connections from "./connections";
 import TakeableItems from "./takeableItems";
 
 const pedestalMessage = `The pedestal reads:
     Bro uhhhhh, let's uhhhh go bro??`;
 
-class RiddleRoom implements Room, InputListener {
+class RiddleRoom extends Room implements InputListener {
 
     private readonly takeableItems: TakeableItems = new TakeableItems();
-    private readonly connections: Connections;
     private readonly largeIronKey: Key;
 
-    constructor(largeIronKey: Key) {
-        this.connections = new Connections(this);
+    constructor(name: string, largeIronKey: Key) {
+        super(name);
         this.largeIronKey = largeIronKey;
     }
 
-    getName() {
-        return "just a little room ya know!";
-    }
-
-    getActions(game: Game): ActionBuilder {
+    getOptions(game: Game): Option[] {
         const takeOptions = this.takeableItems.getTakeOptions(game.player);
         const lookAtOptions = this.takeableItems.getLookAtOptions(game.player);
 
-        return new ActionStart(...nonNull(
-            this.connections.getGoOption(),
+        return nonNull(
+            ...super.getOptions(game),
             takeOptions.length > 0
                 ? Option.forAction("take", new OptionsBuilder(
                     "You must specify which item to take.",
@@ -53,11 +45,7 @@ class RiddleRoom implements Room, InputListener {
                     ...lookAtOptions
                 )
             ))
-        ));
-    }
-    
-    getConnections() {
-        return this.connections;
+        );
     }
 
     consumeInput(message: string, game: Game) {

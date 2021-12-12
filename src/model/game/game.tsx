@@ -1,7 +1,8 @@
 import Direction from "../userinput/direction";
 import Player from "./player";
 import PlayerConfig from "../playerConfig";
-import Room, { makeRooms, Rooms } from "./room";
+import Room from "./room";
+import { Rooms, makeRooms } from "./rooms";
 import { parseInput, ParseResponseType } from "../userinput/input";
 import ActionBuilder from "../userinput/actions/actionBuilder";
 import { CombinedContextBuilder } from "../userinput/actions/combinedBuilders";
@@ -40,7 +41,7 @@ class Game {
         this.rooms = rooms.rooms;
 
         this.currentRoom = rooms.startRoom;
-        this.log(`You are in ${this.currentRoom.getName()}`);
+        this.log(`You are in ${this.currentRoom.name}`);
 
         this.cachedActions = new CombinedContextBuilder(this.player.getActions(), this.currentRoom.getActions(this));
     }
@@ -50,7 +51,7 @@ class Game {
     }
 
     go(direction: Direction) {
-        const connection = this.currentRoom.getConnections().getConnection(direction);
+        const connection = this.currentRoom.connections.getConnection(direction);
         if (!connection) return;
 
         const key = connection.getKey();
@@ -98,7 +99,7 @@ class Game {
     }
 
     private enter(room: Room) {
-        this.log(`You are in ${room.getName()}`);
+        this.log(`You are in ${room.name}`);
         this.currentRoom = room;
     }
 
