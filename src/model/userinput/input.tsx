@@ -33,7 +33,8 @@ function exactPrefixMatch(str: string, prefix: string): boolean {
 }
 
 function parseInput(input: string, actionBuilder: ActionBuilder): Suggestions | Result {
-    const context = actionBuilder.context();
+    const context = actionBuilder.context()
+        .filter(option => hasTerminal(option));
     input = input.toLowerCase();
     const matches = context.filter(option => exactPrefixMatch(input, option.name));
 
@@ -50,6 +51,12 @@ function parseInput(input: string, actionBuilder: ActionBuilder): Suggestions | 
     return new Suggestions(context
         .filter(option => exactPrefixMatch(option.name, input))
         .map(match => match.withConsumed(input.length)));
+}
+
+function hasTerminal(option: Option): boolean {
+    return option.actionBuilder.terminal() 
+        || option.actionBuilder.context()
+            .some(option => hasTerminal(option));
 }
 
 export { ParseResponseType, parseInput };

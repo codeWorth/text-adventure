@@ -23,24 +23,19 @@ class StartRoom extends Room {
     }
 
     getOptions(game: Game): Option[] {
-        const lookAtOptions = this.takeableItems.getLookAtOptions();
-        const takeOptions = this.takeableItems.getTakeOptions(game.player);
-
         return nonNull(
             ...super.getOptions(game),
             Option.forAction("look", new LookBuilder(
                 "There is a single torch on the wall, dimly illuminating the stone walls.\n" + this.connections.getDescription(),
-                lookAtOptions.length > 0
-                    ? new OptionsBuilder(
-                        "You must specify what to look at.",
-                        ...lookAtOptions)
-                    : undefined
+                new OptionsBuilder(
+                    "You must specify what to look at.",
+                    ...this.takeableItems.getLookAtOptions()
+                )
             )),
-            takeOptions.length > 0
-                ? Option.forAction("take", new OptionsBuilder(
-                    "You must specify which item to take.",
-                    ...takeOptions))
-                : undefined
+            Option.forAction("take", new OptionsBuilder(
+                "You must specify which item to take.",
+                ...this.takeableItems.getTakeOptions(game.player)
+            ))
         );
     }
 }

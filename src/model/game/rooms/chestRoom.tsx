@@ -22,16 +22,12 @@ class ChestRoom extends Room {
     }
 
     getOptions(game: Game): Option[] {
-        const takeOptions = this.takeableItems.getTakeOptions(game.player);
-        const lookAtOptions = this.takeableItems.getLookAtOptions();
-
         return nonNull(
             ...super.getOptions(game),
-            takeOptions.length > 0
-                ? Option.forAction("take", new OptionsBuilder(
-                    "You must specify which item to take.",
-                    ...takeOptions))
-                : undefined,
+            Option.forAction("take", new OptionsBuilder(
+                "You must specify which item to take.",
+                ...this.takeableItems.getTakeOptions(game.player)
+            )),
             Option.forAction("look", new LookBuilder(
                 "The room is empty except for a wooden chest.\n" + this.connections.getDescription(),
                 new OptionsBuilder(
@@ -43,7 +39,7 @@ class ChestRoom extends Room {
                         " chest",
                         " wooden chest"
                     ),
-                    ...lookAtOptions
+                    ...this.takeableItems.getLookAtOptions()
                 )
             )),
             !this.chestOpen 
