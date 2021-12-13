@@ -12,6 +12,10 @@ class PlayerAction implements ActionBuilder {
     apply(game: Game) {
         game.error("Please enter a command");
     }
+
+    terminal(): boolean {
+        return false;
+    }
 }
 
 class ViewInventory implements ActionBuilder {
@@ -21,6 +25,10 @@ class ViewInventory implements ActionBuilder {
 
     apply(game: Game) {
         game.player.printInventory(game);
+    }
+
+    terminal(): boolean {
+        return true;
     }
 }
 

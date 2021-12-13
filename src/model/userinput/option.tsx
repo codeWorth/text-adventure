@@ -18,6 +18,10 @@ class Option {
     public static forAction(name: string, actionBuilder: ActionBuilder) {
         return new Option(name, actionBuilder, 0);
     }
+
+    public static forNames(actionBuilder: ActionBuilder, ...names: string[]) {
+        return names.map(name => this.forAction(name, actionBuilder));
+    }
 };
 
 export default Option;

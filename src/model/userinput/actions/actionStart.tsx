@@ -16,6 +16,10 @@ class ActionStart implements ActionBuilder {
     apply(game: Game) {
         game.error("Please enter a command.");
     }
+
+    terminal(): boolean {
+        return false;
+    }
 }
 
 export default ActionStart;

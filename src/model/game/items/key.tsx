@@ -14,7 +14,7 @@ class Key extends Item {
     constructor({name, pickupNames, openMessage, lockedMessage}: KeyParameters) {
         super(name, pickupNames);
         this.openMessage = openMessage ? openMessage : `You unlock the door with the ${name}.`;
-        this.lockedMessage = lockedMessage ? lockedMessage : "This door is locked, you need a key to open it."
+        this.lockedMessage = lockedMessage ? lockedMessage : "This door is locked."
     }
 }
 

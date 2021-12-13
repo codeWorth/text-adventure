@@ -18,6 +18,10 @@ class OptionsBuilder implements ActionBuilder {
     apply(game: Game) {
         game.error(this.errorMessage);
     }
+
+    terminal(): boolean {
+        return false;
+    }
 }
 
 export default OptionsBuilder;

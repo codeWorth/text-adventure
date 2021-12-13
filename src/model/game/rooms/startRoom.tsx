@@ -23,7 +23,7 @@ class StartRoom extends Room {
     }
 
     getOptions(game: Game): Option[] {
-        const lookAtOptions = this.takeableItems.getLookAtOptions(game.player);
+        const lookAtOptions = this.takeableItems.getLookAtOptions();
         const takeOptions = this.takeableItems.getTakeOptions(game.player);
 
         return nonNull(

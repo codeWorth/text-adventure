@@ -18,6 +18,10 @@ export class GoBuilder implements ActionBuilder {
     apply(game: Game) {
         game.error("You must specify the direction to go.");
     }
+
+    terminal(): boolean {
+        return false;
+    }
 }
 
 export class GoFinished implements ActionBuilder {
@@ -33,5 +37,9 @@ export class GoFinished implements ActionBuilder {
 
     apply(game: Game) {
         game.go(this.direction);
+    }
+
+    terminal(): boolean {
+        return true;
     }
 }

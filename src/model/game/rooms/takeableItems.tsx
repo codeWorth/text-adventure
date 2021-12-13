@@ -36,6 +36,11 @@ class TakeableItems {
         }));
     }
 
+    discoverItems() {
+        this.items.filter(item => item.state === ItemState.UNKNOWN)
+            .forEach(item => item.state = ItemState.KNOWN);
+    }
+
     addKnownItem(item: Item, lookMessage: string, pickupMessage?: string) {
         this.items.push({
             item: item,
@@ -45,7 +50,7 @@ class TakeableItems {
         });
     }
 
-    getLookAtOptions(player: Player): Option[] {
+    getLookAtOptions(): Option[] {
         const presentItems = this.presentItems();
         return presentItems.flatMap(itemEntry => itemEntry.item.pickupNames.map(name => 
             Option.forAction(

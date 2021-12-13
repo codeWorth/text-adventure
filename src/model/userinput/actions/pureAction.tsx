@@ -15,6 +15,10 @@ class PureAction implements ActionBuilder {
     apply(game: Game) {
         this.action(game);
     }
+
+    terminal(): boolean {
+        return true;
+    }
 }
 
 export default PureAction;

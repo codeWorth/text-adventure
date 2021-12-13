@@ -16,6 +16,10 @@ class LogAction implements ActionBuilder {
     apply(game: Game) {
         game.log(this.message);
     }
+
+    terminal(): boolean {
+        return true;
+    }
 }
 
 export default LogAction;

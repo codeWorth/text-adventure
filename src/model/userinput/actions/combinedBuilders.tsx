@@ -14,12 +14,20 @@ export class CombinedContextBuilder implements ActionBuilder {
     }
 
     apply(game: Game) {
-        this.actionBuilders[0].apply(game);
+        game.error("Unknown command.");
+    }
+
+    terminal(): boolean {
+        return false;
     }
 }
 
 export class CombinedApplyBuilder extends CombinedContextBuilder {
     apply(game: Game) {
         this.actionBuilders.forEach(action => action.apply(game));
+    }
+
+    terminal(): boolean {
+        return this.actionBuilders.some(action => action.terminal());
     }
 }

@@ -17,6 +17,14 @@ class Connections {
         return this.connections.get(direction);
     }
 
+    getDirection(connection: Connection): Direction | undefined {
+        for (const [direction, conn] of Array.from(this.connections.entries())) {
+            if (conn === connection) {
+                return direction;
+            }
+        }
+    }
+
     addConnection(direction: Direction, connection: Connection) {
         this.connections.set(direction, connection);
     }
