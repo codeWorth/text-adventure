@@ -19,8 +19,7 @@ class Room {
     getOptions(game: Game): Option[] {
         return nonNull(
             this.connections.getGoOption(), 
-            Option.forName("hello", new LogAction(helloMsg)),
-            game.player.equipOptions()
+            Option.forName("hello", new LogAction(helloMsg))
         );
     }
 

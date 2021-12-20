@@ -10,7 +10,11 @@ class BasicEnemy extends Enemy {
     }
 
     decideAction(game: Game): WeaponAction {
-        return WeaponAction.NORMAL_ATTACK;
+        if (this.getStamina() > 0) {
+            return WeaponAction.NORMAL_ATTACK;
+        } else {
+            return WeaponAction.REST;
+        }
     }
 }
 

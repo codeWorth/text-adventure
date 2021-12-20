@@ -39,10 +39,16 @@ class Entity {
     setStamina(stamina: number): boolean {
         if (stamina < 0) {
             return false;
+        } else if (stamina > this.maxStamina) {
+            return false;
         } else {
             this.stamina = stamina;
             return true;
         }
+    }
+
+    increaseStamina(amount: number) {
+        this.stamina = Math.min(this.stamina + amount, this.maxStamina);
     }
 
     getHealthBar(): string{
@@ -51,6 +57,10 @@ class Entity {
 
     getStaminaBar(): string {
         return `${this.getStamina()} / ${this.maxStamina}`;
+    }
+
+    isAlive(){
+        return this.getHealth() > 0;
     }
 
     printBattleInfo(game: Game) {

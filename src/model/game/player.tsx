@@ -1,6 +1,4 @@
-//import Direction from "./direction";
 import PlayerConfig from "../playerConfig";
-import OptionsBuilder from "../userinput/actions/optionsBuilder";
 import PlayerAction from "../userinput/actions/playerActions";
 import PureAction from "../userinput/actions/pureAction";
 import Option from "../userinput/option";
@@ -11,57 +9,43 @@ import Item from "./items/item";
 import Key from "./items/key";
 import { ATTACK_MAP, Weapon, WeaponAction } from "./items/weapon";
 
+const STAMINA_REST_AMOUNT = 2;
+
 class Player extends Entity {
     //an inventory
     private inventory: Item[];
+
+    public inCombat: boolean;
 
     //equipped weapons or items (like 4 slots)
     //private equipSlots: Slot;
     constructor(config: PlayerConfig){
         super(config.name, 10, 10);
         this.inventory = [];
+        this.inCombat = false;
     }
 
-    attackOption(game: Game, enemy: Enemy): Option | undefined {
+    attackOption(enemy: Enemy): Option | undefined {
         if (this.canAttack()) {
-            return Option.forName("attack", new PureAction(() => {
+            return Option.forName("attack", new PureAction(game => {
                 game.attackTurn(this.mainHand ? ATTACK_MAP[this.mainHand.type] : WeaponAction.NONE, enemy);
             }))
         }
     }
 
-    equipOptions(): Option {
-        return Option.forName("equip", new OptionsBuilder(
-            "You must specify which item to equip.",
-            ...this.inventory.filter(item => item instanceof Weapon)
-                .map(item => (item as Weapon))
-                .filter(item => item.canMainHand() && !item.canOffHand())
-                .flatMap(item => Option.forNames(
-                    new PureAction(game => this.equipToMainHand(item, game)), 
-                    ...item.pickupNames.map(name => " " + name)
-                )),
-            ...this.inventory.filter(item => item instanceof Weapon)
-                .map(item => (item as Weapon))
-                .filter(item => !item.canMainHand() && item.canOffHand())
-                .flatMap(item => Option.forNames(
-                    new PureAction(game => this.equipToOffHand(item, game)), 
-                    ...item.pickupNames.map(name => " " + name)
-                )),
-            ...this.inventory.filter(item => item instanceof Weapon)
-                .map(item => (item as Weapon))
-                .filter(item => item.canMainHand() && item.canOffHand())
-                .flatMap(item => Option.forNames(
-                    new OptionsBuilder(
-                        "You must specify which hand to equip to.",
-                        Option.forName(" to main hand", new PureAction(game => this.equipToMainHand(item, game))),
-                        Option.forName(" to off hand", new PureAction(game => this.equipToOffHand(item, game)))
-                    ),
-                    ...item.pickupNames.map(name => " " + name)
-                ))
-        ));
+    restOption(enemy: Enemy) {
+        return Option.forName("rest", new PureAction(game => {
+            game.attackTurn(WeaponAction.REST, enemy);
+        }));
     }
 
-    private equipToMainHand(weapon: Weapon, game: Game) {
+    rest(game: Game) {
+        const oldStamina = this.getStamina();
+        this.increaseStamina(STAMINA_REST_AMOUNT);
+        game.log(`You take a quick breather. Phew! You regained ${this.getStamina() - oldStamina} stamina.`);
+    }
+
+    equipToMainHand(weapon: Weapon, game: Game) {
         game.log(`Equiped ${weapon.name}.`);
         if (this.mainHand) {
             this.addItem(this.mainHand);
@@ -70,7 +54,7 @@ class Player extends Entity {
         this.removeItem(weapon);
     }
 
-    private equipToOffHand(weapon: Weapon, game: Game) {
+    equipToOffHand(weapon: Weapon, game: Game) {
         game.log(`Equiped ${weapon.name}.`);
         if (this.offHand) {
             this.addItem(this.offHand);
@@ -85,15 +69,9 @@ class Player extends Entity {
         }
     }
 
-    getName(){
-        return this.name;
-    }
-
-    isAlive(){
-        if(this.getHealth() < 0){
-            return false;
-        }
-        return true;
+    getWeaponsInInventory() {
+        return this.inventory.filter(item => item instanceof Weapon)
+            .map(item => item as Weapon);
     }
 
     hasKey(key: Key): boolean {
@@ -130,7 +108,7 @@ ${itemsStr}`);
     }
 
     getActions() {
-        return new PlayerAction();
+        return new PlayerAction(this);
     }
 };
 

@@ -16,9 +16,9 @@ class BasicNormalWeapon extends NormalWeapon {
     }
 
     attack(otherAction: WeaponAction, source: Entity, target: Entity, game: Game): void {
-        if (otherAction === WeaponAction.NORMAL_ATTACK) {
-            game.log(`${source.name} attacked ${target.name} for ${this.damage} damage!`);
+        if ([WeaponAction.LIGHT_ATTACK, WeaponAction.NORMAL_ATTACK, WeaponAction.HEAVY_ATTACK, WeaponAction.REST, WeaponAction.NONE].includes(otherAction)) {
             if (source.setStamina(source.getStamina() - this.stamina)) {
+                game.log(`${source.name} attacked ${target.name} for ${this.damage} damage!`);
                 target.setHealth(target.getHealth() - this.damage);
             } else if (source instanceof Player) {
                 game.log("You are too tired to do that!");

@@ -78,11 +78,20 @@ class Game {
     */
     attackTurn(playerAction: WeaponAction, enemy: Enemy) {
         const enemyAction = enemy.decideAction(this);
-        this.player.mainHand?.attack(enemyAction, this.player, enemy, this);
-        this.player.offHand?.attack(enemyAction, this.player, enemy, this);
-        
-        enemy.mainHand?.attack(playerAction, enemy, this.player, this);
-        enemy.offHand?.attack(playerAction, enemy, this.player, this);
+
+        if (enemyAction === WeaponAction.REST) {
+            enemy.rest(this);
+        } else if (enemyAction !== WeaponAction.NONE) {
+            enemy.mainHand?.attack(playerAction, enemy, this.player, this);
+            enemy.offHand?.attack(playerAction, enemy, this.player, this);
+        }
+
+        if (playerAction === WeaponAction.REST) {
+            this.player.rest(this);
+        } else if (playerAction !== WeaponAction.NONE) {
+            this.player.mainHand?.attack(enemyAction, this.player, enemy, this);
+            this.player.offHand?.attack(enemyAction, this.player, enemy, this);
+        }
 
         enemy.printBattleInfo(this);
         this.player.printBattleInfo(this);
