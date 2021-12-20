@@ -11,7 +11,7 @@ const Log = (props: LogProps) => {
 
     useEffect(
         () => scrollDiv.current?.scrollIntoView({behavior: "smooth"}), 
-        [props.entries]);
+        [props.entries, props.errorMessage]);
 
     return (
         <div id="history">
