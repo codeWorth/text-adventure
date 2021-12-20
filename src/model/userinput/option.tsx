@@ -15,12 +15,12 @@ class Option {
         return new Option(this.name, this.actionBuilder, consumed);
     }
 
-    public static forAction(name: string, actionBuilder: ActionBuilder) {
+    public static forName(name: string, actionBuilder: ActionBuilder) {
         return new Option(name, actionBuilder, 0);
     }
 
     public static forNames(actionBuilder: ActionBuilder, ...names: string[]) {
-        return names.map(name => this.forAction(name, actionBuilder));
+        return names.map(name => this.forName(name, actionBuilder));
     }
 };
 

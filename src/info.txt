@@ -1,13 +1,3 @@
-All Melee -> Light (two daggers), Normal (sword and shield), Heavy (two-handed axe)
-
-Attack (normal)
-->blockable, parryable, happens in one turn, not stunable
-Heavy Attack -> takes one turn of nothing, then does double damage of normal attack, stunable on 1st turn, not blockable but can be parried
-
-Parry, Block, Attack
-
-
-_______________________________________________________________
 Actions happen simulatenously
 Enemies have set sequences of moves (perhaps some message like "skeleton roars"!" tells you what they're about to do)
 Player begins each battle with X stamina

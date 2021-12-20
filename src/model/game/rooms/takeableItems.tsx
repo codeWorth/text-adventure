@@ -4,7 +4,7 @@ import { CombinedApplyBuilder } from "../../userinput/actions/combinedBuilders";
 import LogAction from "../../userinput/actions/logAction";
 import PureAction from "../../userinput/actions/pureAction";
 import Option from "../../userinput/option";
-import Item from "../item";
+import Item from "../items/item";
 import Player from "../player";
 
 enum ItemState {
@@ -53,7 +53,7 @@ class TakeableItems {
     getLookAtOptions(): Option[] {
         const presentItems = this.presentItems();
         return presentItems.flatMap(itemEntry => itemEntry.item.pickupNames.map(name => 
-            Option.forAction(
+            Option.forName(
                 " " + name.toLowerCase(), 
                 new CombinedApplyBuilder(
                     new LogAction(itemEntry.lookMessage),
@@ -66,7 +66,7 @@ class TakeableItems {
     getTakeOptions(player: Player): Option[] {
         return this.knownItems().flatMap(itemEntry => 
             itemEntry.item.pickupNames.map(name => 
-                Option.forAction(
+                Option.forName(
                     " " + name.toLowerCase(),
                     new CombinedApplyBuilder(...nonNull<ActionBuilder>(
                         map(itemEntry.pickupMessage, msg => new LogAction(msg)),

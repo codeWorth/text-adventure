@@ -8,7 +8,7 @@ export class GoBuilder implements ActionBuilder {
 
     constructor(...directions: Direction[]) {
         this.options = Array.from(new Set(directions))
-            .map(direction => Option.forAction(" " + direction, new GoFinished(direction)));
+            .map(direction => Option.forName(" " + direction, new GoFinished(direction)));
     }
 
     context(): Option[] {

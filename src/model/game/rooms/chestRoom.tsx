@@ -24,18 +24,18 @@ class ChestRoom extends Room {
     getOptions(game: Game): Option[] {
         return nonNull(
             ...super.getOptions(game),
-            Option.forAction("take", new OptionsBuilder(
+            Option.forName("take", new OptionsBuilder(
                 "You must specify which item to take.",
                 ...this.chest.getTakeOptions(game.player)
             )),
-            Option.forAction("look", new LookBuilder(
+            Option.forName("look", new LookBuilder(
                 "The room is empty except for a wooden chest.\n" + this.connections.getDescription(),
                 new OptionsBuilder(
                     "You must specify what to look at.",
                     ...this.chest.getLookOptions()
                 )
             )),
-            Option.forAction("open", new OptionsBuilder(
+            Option.forName("open", new OptionsBuilder(
                 "You must specify what to open.",
                 ...this.chest.getOpenOptions()
             ))

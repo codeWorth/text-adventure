@@ -13,7 +13,7 @@ class LookBuilder implements ActionBuilder {
 
     context(): Option[] {
         if (this.lookAt) {
-            return [Option.forAction(" at",  this.lookAt)];
+            return [Option.forName(" at",  this.lookAt)];
         } else {
             return [];
         }

@@ -6,6 +6,8 @@ import { Rooms, makeRooms } from "./rooms";
 import { parseInput, ParseResponseType } from "../userinput/input";
 import ActionBuilder from "../userinput/actions/actionBuilder";
 import { CombinedContextBuilder } from "../userinput/actions/combinedBuilders";
+import { WeaponAction } from "./items/weapon";
+import Enemy from "./enemies/enemy";
 
 export enum InputMode {
     COMMANDS, TEXT
@@ -67,6 +69,23 @@ class Game {
         }
         this.writeLog(`Going ${direction}...`);
         this.enter(connection.getDestination(this.currentRoom));
+    }
+
+    /*
+    Assumptions:
+        If only one action is happening this turn, it happens in main hand
+        Only normal attacks may happen in both hands
+    */
+    attackTurn(playerAction: WeaponAction, enemy: Enemy) {
+        const enemyAction = enemy.decideAction(this);
+        this.player.mainHand?.attack(enemyAction, this.player, enemy, this);
+        this.player.offHand?.attack(enemyAction, this.player, enemy, this);
+        
+        enemy.mainHand?.attack(playerAction, enemy, this.player, this);
+        enemy.offHand?.attack(playerAction, enemy, this.player, this);
+
+        enemy.printBattleInfo(this);
+        this.player.printBattleInfo(this);
     }
 
     log(message: string) {

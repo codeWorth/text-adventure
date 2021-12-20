@@ -5,7 +5,7 @@ import ActionBuilder from "./actionBuilder";
 class PlayerAction implements ActionBuilder {
     context() {
         return [
-            Option.forAction("inventory", new ViewInventory())
+            Option.forName("inventory", new ViewInventory())
         ];
     }
 

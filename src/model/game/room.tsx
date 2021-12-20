@@ -19,7 +19,9 @@ class Room {
     getOptions(game: Game): Option[] {
         return nonNull(
             this.connections.getGoOption(), 
-            Option.forAction("hello", new LogAction(helloMsg)));
+            Option.forName("hello", new LogAction(helloMsg)),
+            game.player.equipOptions()
+        );
     }
 
     getActions(game: Game): ActionBuilder {

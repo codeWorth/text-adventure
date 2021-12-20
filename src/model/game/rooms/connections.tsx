@@ -31,7 +31,7 @@ class Connections {
 
     getGoOption(): Option | undefined {
         return this.getDirections().length > 0 
-            ? Option.forAction(
+            ? Option.forName(
                 "go", 
                 new GoBuilder(...this.getDirections())
             ) 

@@ -24,11 +24,11 @@ class RiddleRoom extends Room implements InputListener {
     getOptions(game: Game): Option[] {
         return nonNull(
             ...super.getOptions(game),
-            Option.forAction("look", new LookBuilder(
+            Option.forName("look", new LookBuilder(
                 "A small pedestal stands in the center of the room.\n" + this.connections.getDescription(),
                 new OptionsBuilder(
                     "You must specify what to look at.",
-                    Option.forAction(" pedestal", new CombinedApplyBuilder(
+                    Option.forName(" pedestal", new CombinedApplyBuilder(
                         new LogAction(pedestalMessage),
                         new PureAction(() => game.consumeNextInput(this))
                     )),
