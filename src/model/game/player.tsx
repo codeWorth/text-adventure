@@ -54,6 +54,14 @@ class Player extends Entity {
         this.removeItem(weapon);
     }
 
+    unequipMainHand(game: Game) {
+        if (this.mainHand) {
+            game.log(`Unequiped ${this.mainHand.name}.`);
+            this.addItem(this.mainHand);
+            this.mainHand = undefined;
+        }
+    }
+
     equipToOffHand(weapon: Weapon, game: Game) {
         game.log(`Equiped ${weapon.name}.`);
         if (this.offHand) {
@@ -63,9 +71,11 @@ class Player extends Entity {
         this.removeItem(weapon);
     }
 
-    increaseMaxHealth(amt: number){
-        if(amt > 0){
-            this.maxHealth += amt;
+    unequipOffHand(game: Game) {
+        if (this.offHand) {
+            game.log(`Unequiped ${this.offHand.name}.`);
+            this.addItem(this.offHand);
+            this.offHand = undefined;
         }
     }
 

@@ -6,11 +6,13 @@ class Entity {
     public readonly name: string;
     private health: number;
     private stamina: number;
-    protected maxHealth: number;
-    protected maxStamina: number;
+    private maxHealth: number;
+    private maxStamina: number;
 
     public mainHand?: Weapon;
     public offHand?: Weapon;
+
+    private deathListeners: (() => void)[];
 
     constructor(name: string, maxHealth: number, maxStamina: number) {
         this.name = name;
@@ -18,6 +20,11 @@ class Entity {
         this.health = maxHealth;
         this.maxStamina = maxStamina;
         this.stamina = maxStamina;
+        this.deathListeners = [];
+    }
+
+    addDeathListener(listener: () => void) {
+        this.deathListeners.push(listener);
     }
 
     canAttack(): boolean {
@@ -32,8 +39,21 @@ class Entity {
         return this.stamina;
     }
 
+    getMaxHealth() {
+        return this.maxHealth;
+    }
+
+    getMaxStamina() {
+        return this.maxStamina;
+    }
+
     setHealth(health: number) {
-        this.health = health;
+        if (health <= 0 && this.isAlive()) {
+            this.health = 0;
+            this.deathListeners.forEach(listener => listener());
+        } else {
+            this.health = Math.min(this.maxHealth, health);
+        }
     }
 
     setStamina(stamina: number): boolean {
@@ -49,6 +69,12 @@ class Entity {
 
     increaseStamina(amount: number) {
         this.stamina = Math.min(this.stamina + amount, this.maxStamina);
+    }
+
+    increaseMaxHealth(amt: number){
+        if(amt > 0){
+            this.maxHealth += amt;
+        }
     }
 
     getHealthBar(): string{

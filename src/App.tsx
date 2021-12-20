@@ -38,6 +38,11 @@ function App() {
         setErrorMessage(message);
     }
 
+    function restart() {
+        setLogEntries([]);
+        game.current = new Game(log, error, restart, playerSetup.current);
+    }
+
     function setInputContent(content: string) {
         _setInputContent(content);
 
@@ -71,7 +76,7 @@ function App() {
             _setInputContent("");
             if (playerSetup.current.isFinished()) {
                 setLogEntries([]);
-                game.current = new Game(log, error, playerSetup.current);
+                game.current = new Game(log, error, restart, playerSetup.current);
                 gameScreen.current = GameScreen.GAMEPLAY;
             } else {
                 log(playerSetup.current.promptMessage());

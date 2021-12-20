@@ -10,7 +10,7 @@ import { WeaponAction } from "./items/weapon";
 import Enemy from "./enemies/enemy";
 
 export enum InputMode {
-    COMMANDS, TEXT
+    COMMANDS, TEXT, GAME_OVER
 };
 
 export interface InputListener {
@@ -22,6 +22,7 @@ class Game {
 
     private readonly writeLog: (entry: string) => void;
     private readonly writeError: (entry: string) => void;
+    private readonly restart: () => void;
 
     private rooms: Room[];
     private currentRoom: Room;
@@ -34,11 +35,14 @@ class Game {
     constructor(
         writeLog: (entries: string) => void, 
         writeError: (entries: string) => void,
+        restart: () => void,
         playerConfig: PlayerConfig
     ) {
         this.writeLog = writeLog;
         this.writeError = writeError;
+        this.restart = restart;
         this.player = new Player(playerConfig);
+        this.player.addDeathListener(() => this.endGame());
         const rooms: Rooms = makeRooms(); 
         this.rooms = rooms.rooms;
 
@@ -97,6 +101,18 @@ class Game {
         this.player.printBattleInfo(this);
     }
 
+    enterCombat(enemy: Enemy) {
+        this.player.printBattleInfo(this);
+        enemy.printBattleInfo(this);
+        this.player.inCombat = true;
+        enemy.addDeathListener(() => this.leaveCombat());
+    }
+
+    private leaveCombat() {
+        this.player.inCombat = false;
+        this.player.setStamina(this.player.getMaxStamina());
+    }
+
     log(message: string) {
         this.writeLog(message);
     }
@@ -122,6 +138,12 @@ class Game {
             this.inputListener!.consumeInput(message, this);
             this.inputListener = undefined;
             this.inputMode = InputMode.COMMANDS;
+        } else if (this.inputMode === InputMode.GAME_OVER) {
+            if (message.trim().toLowerCase() === "restart") {
+                this.restart();
+            } else {
+                this.error("You lost! Type restart to try again");
+            }
         }
         this.setCachedActions();
     }
@@ -137,6 +159,10 @@ class Game {
 
     private setCachedActions() {
         this.cachedActions = new CombinedContextBuilder(this.player.getActions(), this.currentRoom.getActions(this));
+    }
+
+    private endGame() {
+        this.log("Game over!");
     }
 };
 

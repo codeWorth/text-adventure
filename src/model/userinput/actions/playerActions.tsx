@@ -1,3 +1,4 @@
+import { nonNull } from "../../../util";
 import Game from "../../game/game";
 import Player from "../../game/player";
 import Option from "../option";
@@ -46,6 +47,17 @@ class PlayerAction implements ActionBuilder {
                         return [];
                     }
                 })
+            )),
+            Option.forName("unequip", new OptionsBuilder(
+                "You must specify which hand to unequip.",
+                ...nonNull(
+                    this.player.mainHand
+                        ? Option.forName(" main hand", new PureAction(game => this.player.unequipMainHand(game)))
+                        : undefined,
+                    this.player.offHand
+                        ? Option.forName(" off hand", new PureAction(game => this.player.unequipOffHand(game)))
+                        : undefined,
+                )
             ))
         ];
     }
