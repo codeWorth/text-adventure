@@ -1,0 +1,77 @@
+All Melee -> Light (two daggers), Normal (sword and shield), Heavy (two-handed axe)
+
+Attack (normal)
+->blockable, parryable, happens in one turn, not stunable
+Heavy Attack -> takes one turn of nothing, then does double damage of normal attack, stunable on 1st turn, not blockable but can be parried
+
+Parry, Block, Attack
+
+
+_______________________________________________________________
+Actions happen simulatenously
+Enemies have set sequences of moves (perhaps some message like "skeleton roars"!" tells you what they're about to do)
+Player begins each battle with X stamina
+Player has main and off hand
+Status effects (buffs/debuffs) are rare finds on rare weapons
+
+Any:
+	rest:
+		gain stamina
+		does nothing else
+
+Fists (two-handed):
+	attack:
+		does small damage
+		consumes normal stamina
+		blockable
+		parryable
+	
+Normal weapon (one-handed):
+	attack:
+		does normal damage
+		consumes normal stamina
+		blockable
+		parryable
+
+Shield (off-hand only):
+	block:
+		has a chance to stop incoming normal attack
+		always blocks light attack
+		never blocks heavy attack
+		consumes normal stamina
+		does no damage
+
+Light weapon (one-handed):
+	light attack:
+		does small damage
+		consumes small stamina
+		blockable
+		parryable
+		stunned targets take extra damage
+
+Two light weapons:
+	parry:
+		does no damage
+		consumes normal stamina
+		if enemy does NOT attack, does literally nothing lul
+		if enemy does attack, stops all damage + stun enemy for a turn
+
+Heavy weapon (two-handed):
+	heavy attack:
+		takes an extra turn to charge (where you do nothing)
+		does BIG damage
+		takes normal stamina
+		not blockable
+		parryable during charging turn
+	bash:
+		does small damage
+		also blocks
+
+Player stats:
+	attack power
+	health
+	max stamina
+	
+Attack: [-|-|-|-|-]
+Attack: [*|*|-|-|-]
+
