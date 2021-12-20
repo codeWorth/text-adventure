@@ -163,6 +163,7 @@ class Game {
 
     private endGame() {
         this.log("Game over!");
+        this.inputMode = InputMode.GAME_OVER;
     }
 };
 
