@@ -23,7 +23,7 @@ class StartRoom extends Room {
     }
 
     getOptions(game: Game): Option[] {
-        return nonNull(
+        return [
             ...super.getOptions(game),
             Option.forAction("look", new LookBuilder(
                 "There is a single torch on the wall, dimly illuminating the stone walls.\n" + this.connections.getDescription(),
@@ -36,7 +36,7 @@ class StartRoom extends Room {
                 "You must specify which item to take.",
                 ...this.takeableItems.getTakeOptions(game.player)
             ))
-        );
+        ];
     }
 }
 
