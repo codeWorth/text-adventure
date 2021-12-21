@@ -1,5 +1,6 @@
+import { nonNull } from "../../util";
 import PlayerConfig from "../playerConfig";
-import { CombatOption } from "../userinput/actions/combatActions";
+import { CombatOption, UntargetedCombatAction } from "../userinput/actions/combatActions";
 import OptionsBuilder from "../userinput/actions/optionsBuilder";
 import PlayerAction from "../userinput/actions/playerActions";
 import PureAction from "../userinput/actions/pureAction";
@@ -10,7 +11,7 @@ import Game from "./game";
 import BasicNormalWeapon from "./items/basicNormalWeapon";
 import Item from "./items/item";
 import Key from "./items/key";
-import { EquipHand, Weapon } from "./items/weapon";
+import { EquipHand, TurnAction, Weapon } from "./items/weapon";
 
 const STAMINA_REST_AMOUNT = 2;
 
@@ -55,16 +56,17 @@ class Player extends Entity {
         const onlyMainOptions: CombatOption[] = mainOptions.filter(option => !offNames.has(option.name));
         const onlyOffOptions: CombatOption[] = mainOptions.filter(option => !mainNames.has(option.name));
 
-        return [
+        return nonNull(
             ...onlyMainOptions,
             ...onlyOffOptions,
-            Option.forName(
-                "main hand ",
-                new OptionsBuilder(
-                    "You must specify the action to take.",
-                    ...mainOptions
-                )
-            ),
+            this.mainHand?.hand !== EquipHand.BOTH
+                ? Option.forName(
+                    "main hand ",
+                    new OptionsBuilder(
+                        "You must specify the action to take.",
+                        ...mainOptions
+                    ))
+                : undefined,
             Option.forName(
                 "off hand ",
                 new OptionsBuilder(
@@ -72,11 +74,11 @@ class Player extends Entity {
                     ...offOptions
                 )
             ),
-            Option.forName(
+            CombatOption.forName(
                 "rest",
-                new PureAction(game => this.rest(game))
+                new UntargetedCombatAction(TurnAction.REST, game => this.rest(game))
             )
-        ];
+        );
     }
 
     rest(game: Game) {
