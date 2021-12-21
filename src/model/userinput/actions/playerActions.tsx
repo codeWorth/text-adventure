@@ -83,10 +83,11 @@ class PlayerAction implements ActionBuilder {
                         ...weapon.pickupNames
                     );
                 }),
-                ...Option.forNames(
-                    new PureAction(game => this.player.equipTwoHanded(this.player.fists, game)),
-                    ...this.player.fists.pickupNames
-                )
+                ...this.player.mainHand !== this.player.fists
+                    ? Option.forNames(
+                        new PureAction(game => this.player.equipTwoHanded(this.player.fists, game)),
+                        ...this.player.fists.pickupNames)
+                    : []
             )),
             Option.forName("unequip", new OptionsBuilder(
                 "You must specify which hand to unequip.",
