@@ -51,7 +51,7 @@ function App() {
         if (game.current === null) return;
         if (game.current.getCachedActions() === null) return;
 
-        const parsed = parseInput(content.trimEnd(), game.current.getCachedActions());
+        const parsed = parseInput(content, game.current.getCachedActions());
         if (parsed.type === ParseResponseType.SUGGESTIONS && parsed.options.length === 1) {
             const option = parsed.options[0];
             setSuggestion(option.name.substring(option.consumed));
@@ -82,7 +82,7 @@ function App() {
                 log(playerSetup.current.promptMessage());
             }
         } else if (gameScreen.current === GameScreen.GAMEPLAY && game.current !== null) {
-            game.current.handleInput(message.trim());
+            game.current.handleInput(message);
             _setInputContent("");
             setSuggestion("");
         }
@@ -93,7 +93,7 @@ function App() {
         if (game.current === null) return;
         if (game.current.getCachedActions() === null) return;
 
-        const parsed = parseInput(message.trim(), game.current.getCachedActions());
+        const parsed = parseInput(message, game.current.getCachedActions());
         if (parsed.type === ParseResponseType.SUGGESTIONS && parsed.options.length === 1) {
             const option = parsed.options[0];
             const staticContent = message.substring(0, message.length - option.consumed);
