@@ -13,20 +13,30 @@ import { ATTACK_MAP, EquipHand, Weapon, WeaponAction } from "./items/weapon";
 const STAMINA_REST_AMOUNT = 2;
 
 class Player extends Entity {
-    //an inventory
     private inventory: Item[];
 
-    public inCombat: boolean;
+    private combatEnemies: Enemy[];
     public readonly fists: BasicNormalWeapon;
 
-    //equipped weapons or items (like 4 slots)
-    //private equipSlots: Slot;
     constructor(config: PlayerConfig){
         super(config.name, 10, 10);
         this.inventory = [];
-        this.inCombat = false;
+        this.combatEnemies = [];
         this.fists = new BasicNormalWeapon("Fists", [], 1, 2, EquipHand.BOTH);
         this.equipTwoHanded(this.fists);
+    }
+
+    get inCombat(): boolean {
+        return this.combatEnemies.filter(enemy => enemy.isAlive()).length > 0;
+    }
+
+    enterCombat(...enemies: Enemy[]) {
+        this.combatEnemies.push(...enemies);
+        enemies.forEach(enemy => enemy.addDeathListener(() => this.removeEnemy(enemy)));
+    }
+
+    private removeEnemy(enemy: Enemy) {
+        this.combatEnemies = this.combatEnemies.filter(e => e !== enemy);
     }
 
     attackOption(enemy: Enemy): Option | undefined {

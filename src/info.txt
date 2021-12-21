@@ -1,3 +1,7 @@
+Notes for saving game:
+    Serialization is buggy with listeners, in this case enemy death listeners. We will need to refactor this to save game properly.
+    There may be other issues with serialization as well 
+
 Actions happen simulatenously
 Enemies have set sequences of moves (perhaps some message like "skeleton roars"!" tells you what they're about to do)
 Player begins each battle with X stamina

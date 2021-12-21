@@ -92,6 +92,7 @@ class Entity {
     }
 
     printBattleInfo(game: Game) {
+        if (!this.isAlive()) return;
         game.log(`Name: ${this.name}
 Health: ${this.getHealthBar()}`);
     }
