@@ -6,7 +6,7 @@ class Option {
     public readonly consumed: number;
 
     protected constructor(name: string, actionBuilder: ActionBuilder, consumed: number) {
-        this.name = name;
+        this.name = name.toLowerCase();
         this.actionBuilder = actionBuilder;
         this.consumed = consumed;
     }

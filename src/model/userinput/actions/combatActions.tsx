@@ -51,7 +51,7 @@ export class TargetedCombatAction implements ActionBuilder {
     context(): Option[] {
         return this.player.getCombatEnemies()
             .map(enemy => Option.forName(
-                enemy.name, 
+                " " + enemy.name, 
                 new PureAction(game => this.doAction(enemy, game))
             ));
     }
