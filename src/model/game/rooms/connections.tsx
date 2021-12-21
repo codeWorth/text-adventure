@@ -1,13 +1,10 @@
 import { GoBuilder } from "../../userinput/actions/goBuilders";
 import Direction from "../../userinput/direction";
 import Option from "../../userinput/option";
-import Room from "../room";
 import Connection from "./connection";
 
 class Connections {
     private connections: Map<Direction, Connection> = new Map();
-
-    constructor(private readonly room: Room) {}
 
     private getDirections(): Direction[] {
         return Array.from(this.connections.keys());
@@ -52,6 +49,11 @@ class Connections {
                 .join(" ");
             return `There are doors to ${startDirections} and ${directions.slice(-1)[0]}`;
         }
+    }
+
+    unlockAll() {
+        Array.from(this.connections.values())
+            .forEach(connection => connection.unlock());
     }
 }
 

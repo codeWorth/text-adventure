@@ -113,6 +113,10 @@ class Game {
         this.player.setStamina(this.player.getMaxStamina());
     }
 
+    unlockAllRooms() {
+        this.rooms.forEach(room => room.connections.unlockAll());
+    }
+
     log(message: string) {
         this.writeLog(message);
     }

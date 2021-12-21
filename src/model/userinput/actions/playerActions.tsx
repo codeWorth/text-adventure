@@ -102,7 +102,11 @@ class PlayerAction implements ActionBuilder {
                         " off hand",
                         ...this.player.offHand.pickupNames)
                     : []
-            ))
+            )),
+            Option.forName("unlockall", new PureAction(game => {
+                game.unlockAllRooms();
+                game.log("All doors have been unlocked!");
+            }))
         ];
     }
 

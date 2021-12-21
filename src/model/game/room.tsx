@@ -13,7 +13,7 @@ class Room {
 
     constructor(name: string) {
         this.name = name;
-        this.connections = new Connections(this);
+        this.connections = new Connections();
     }
 
     getOptions(game: Game): Option[] {

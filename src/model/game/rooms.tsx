@@ -32,7 +32,6 @@ export function makeRooms(): Rooms {
 
     const startRoom = new StartRoom();
     connect(startRoom, Direction.EAST, riddleRoom);
-    // connect(startRoom, Direction.NOTRTH, enemyRoom);
     connect(startRoom, Direction.NOTRTH, enemyRoom, largeIronKey);
 
     return {startRoom: startRoom, rooms: [startRoom, riddleRoom]};
