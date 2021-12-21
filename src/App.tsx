@@ -51,7 +51,7 @@ function App() {
         if (game.current === null) return;
         if (game.current.getCachedActions() === null) return;
 
-        const parsed = parseInput(content.trim(), game.current.getCachedActions());
+        const parsed = parseInput(content.trimEnd(), game.current.getCachedActions());
         if (parsed.type === ParseResponseType.SUGGESTIONS && parsed.options.length === 1) {
             const option = parsed.options[0];
             setSuggestion(option.name.substring(option.consumed));

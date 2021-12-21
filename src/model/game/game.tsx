@@ -8,6 +8,7 @@ import ActionBuilder from "../userinput/actions/actionBuilder";
 import { CombinedContextBuilder } from "../userinput/actions/combinedBuilders";
 import { WeaponAction } from "./items/weapon";
 import Enemy from "./enemies/enemy";
+import EmptyAction from "../userinput/actions/emptyAction";
 
 export enum InputMode {
     COMMANDS, TEXT, GAME_OVER
@@ -48,8 +49,7 @@ class Game {
 
         this.currentRoom = rooms.startRoom;
         this.log(`You are in ${this.currentRoom.name}`);
-
-        this.cachedActions = new CombinedContextBuilder(this.player.getActions(), this.currentRoom.getActions(this));
+        this.cachedActions = this.generateActions();
     }
 
     getCurrentRoom(): Room {
@@ -124,6 +124,7 @@ class Game {
     consumeNextInput(inputListener: InputListener) {
         this.inputMode = InputMode.TEXT;
         this.inputListener = inputListener;
+        this.cachedActions = this.generateActions();
     }
 
     handleInput(message: string) {
@@ -145,7 +146,7 @@ class Game {
                 this.error("You lost! Type restart to try again");
             }
         }
-        this.setCachedActions();
+        this.cachedActions = this.generateActions();
     }
 
     private enter(room: Room) {
@@ -153,17 +154,22 @@ class Game {
         this.currentRoom = room;
     }
 
-    getCachedActions() {
+    getCachedActions(): ActionBuilder {
         return this.cachedActions;
     }
 
-    private setCachedActions() {
-        this.cachedActions = new CombinedContextBuilder(this.player.getActions(), this.currentRoom.getActions(this));
+    private generateActions(): ActionBuilder {
+        if (this.inputMode === InputMode.COMMANDS) {
+            return new CombinedContextBuilder(this.player.getActions(), this.currentRoom.getActions(this));
+        } else {
+            return new EmptyAction();
+        }
     }
 
     private endGame() {
         this.log("Game over!");
         this.inputMode = InputMode.GAME_OVER;
+        this.cachedActions = this.generateActions();
     }
 };
 
