@@ -20,6 +20,10 @@ export class CombinedContextBuilder implements ActionBuilder {
     terminal(): boolean {
         return false;
     }
+
+    usage(): string {
+        return "<command>";
+    }
 }
 
 export class CombinedApplyBuilder extends CombinedContextBuilder {

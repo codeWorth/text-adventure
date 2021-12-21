@@ -31,6 +31,10 @@ class LookBuilder implements ActionBuilder {
     terminal(): boolean {
         return true;
     }
+
+    usage(): string {
+        return "(at) <target>";
+    }
 }
 
 export default LookBuilder;

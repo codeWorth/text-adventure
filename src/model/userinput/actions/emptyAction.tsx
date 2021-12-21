@@ -1,18 +1,9 @@
 import Game from "../../game/game";
-import Option from "../option";
-import ActionBuilder from "./actionBuilder";
+import TerminalAction from "./terminalAction";
 
-class EmptyAction implements ActionBuilder {
-    context(): Option[] {
-        return [];
-    }
-
+class EmptyAction extends TerminalAction {
     apply(game: Game): void {
         // no-op
-    }
-
-    terminal(): boolean {
-        return false;
     }
 }
 

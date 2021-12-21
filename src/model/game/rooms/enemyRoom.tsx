@@ -17,7 +17,7 @@ class EnemyRoom extends Room {
 
     constructor(name: string) {
         super(name);
-        this.enemy = new BasicEnemy("Skeleton", 3, 3, new BasicNormalWeapon("Rusty Sword", ["sword"], 1, 1));
+        this.enemy = new BasicEnemy("Skeleton", 3, 3, new BasicNormalWeapon("Rusty Sword", ["sword"], 2, 1));
         this.items = new TakeableItems();
     }
 

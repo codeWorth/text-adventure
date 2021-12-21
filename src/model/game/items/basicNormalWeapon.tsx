@@ -15,6 +15,13 @@ class BasicNormalWeapon extends NormalWeapon {
         this.stamina = stamina;
     }
 
+    details(): string {
+        return `Damage: ${this.damage}
+Stamina usage: ${this.stamina}
+Type: Normal
+Equip slot: ${this.hand}`;
+    }
+
     attack(source: Entity, target: Entity, targetAction: TurnAction, game: Game): void {
         switch (targetAction) {
             case TurnAction.NORMAL_ATTACK:

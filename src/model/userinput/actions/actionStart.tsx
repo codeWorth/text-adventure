@@ -20,6 +20,10 @@ class ActionStart implements ActionBuilder {
     terminal(): boolean {
         return false;
     }
+
+    usage(): string {
+        return "<command>";
+    }
 }
 
 export default ActionStart;

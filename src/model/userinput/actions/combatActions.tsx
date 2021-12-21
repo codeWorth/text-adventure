@@ -5,30 +5,24 @@ import Player from "../../game/player";
 import Option from "../option";
 import ActionBuilder from "./actionBuilder";
 import PureAction from "./pureAction";
+import TerminalAction from "./terminalAction";
 
 export type CombatAction = UntargetedCombatAction | TargetedCombatAction;
 
-export class UntargetedCombatAction implements ActionBuilder {
+export class UntargetedCombatAction extends TerminalAction {
     private readonly playerActionType: TurnAction;
     private readonly playerAction: (game: Game) => void;
 
     constructor(playerActionType: TurnAction, playerAction: (game: Game) => void) {
+        super();
         this.playerActionType = playerActionType;
         this.playerAction = playerAction;
-    }
-
-    context(): Option[] {
-        return [];
     }
 
     apply(game: Game): void {
         game.enemyTurn(this.playerActionType);
         this.playerAction(game);
         game.finishTurn();
-    }
-
-    terminal(): boolean {
-        return true;
     }
 }
 
@@ -66,6 +60,10 @@ export class TargetedCombatAction implements ActionBuilder {
 
     terminal(): boolean {
         return this.player.getCombatEnemies().length === 1;
+    }
+
+    usage(): string {
+        return "<target>";
     }
 
     private doAction(target: Enemy, game: Game) {

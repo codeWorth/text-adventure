@@ -2,7 +2,7 @@ import { nonNull } from "../../util";
 import PlayerConfig from "../playerConfig";
 import { CombatOption, UntargetedCombatAction } from "../userinput/actions/combatActions";
 import OptionsBuilder from "../userinput/actions/optionsBuilder";
-import PlayerAction from "../userinput/actions/playerActions";
+import { PlayerAction, EquipAction } from "../userinput/actions/playerActions";
 import PureAction from "../userinput/actions/pureAction";
 import Option from "../userinput/option";
 import Enemy from "./enemies/enemy";
@@ -42,6 +42,15 @@ class Player extends Entity {
         return this.combatEnemies;
     }
 
+    getWeapons(): Weapon[] {
+        return nonNull(
+            !this.usingFists() ? this.mainHand : undefined,
+            this.offHand,
+            this.fists,
+            ...this.getWeaponsInInventory()
+        );
+    }
+
     private removeEnemy(enemy: Enemy) {
         this.combatEnemies = this.combatEnemies.filter(e => e !== enemy);
     }
@@ -61,17 +70,17 @@ class Player extends Entity {
             ...onlyOffOptions,
             this.mainHand?.hand !== EquipHand.BOTH
                 ? Option.forName(
-                    "main hand ",
+                    "main hand",
                     new OptionsBuilder(
                         "You must specify the action to take.",
-                        ...mainOptions
+                        ...mainOptions.map(option => option.prependSpace())
                     ))
                 : undefined,
             Option.forName(
-                "off hand ",
+                "off hand",
                 new OptionsBuilder(
                     "You must specify the action to take.",
-                    ...offOptions
+                    ...offOptions.map(option => option.prependSpace())
                 )
             ),
             CombatOption.forName(
@@ -85,6 +94,71 @@ class Player extends Entity {
         const oldStamina = this.getStamina();
         this.increaseStamina(STAMINA_REST_AMOUNT);
         game.log(`You take a quick breather. Phew! You regained ${this.getStamina() - oldStamina} stamina.`);
+    }
+
+    usingFists(): boolean {
+        return this.mainHand === this.fists;
+    }
+
+    equipOptions(): Option[] {
+        return [
+            ...this.getWeaponsInInventory().flatMap(weapon => {
+                let applyAction: string | PureAction = "You must specify which hand to equip to.";
+                const options = [];
+
+                if (weapon.hand === EquipHand.BOTH) {
+                    applyAction = new PureAction(game => this.equipTwoHanded(weapon, game));
+                }
+
+                if (weapon.hand === EquipHand.MAIN || weapon.hand === EquipHand.ANY) {
+                    options.push(...Option.forNames(
+                        new PureAction(game => this.equipToMainHand(weapon, game)),
+                        " to main hand", 
+                        " main hand",
+                    ));
+                }
+                if (weapon.hand === EquipHand.OFF || weapon.hand === EquipHand.ANY) {
+                    options.push(...Option.forNames(
+                        new PureAction(game => this.equipToOffHand(weapon, game)),
+                        " to off hand", 
+                        " off hand",
+                    ));
+                }
+
+                if (weapon.hand === EquipHand.ANY && (!this.mainHand || this.usingFists())) {
+                    applyAction = new PureAction(game => this.equipToMainHand(weapon, game));
+                } else if (weapon.hand === EquipHand.ANY && !this.offHand) {
+                    applyAction = new PureAction(game => this.equipToOffHand(weapon, game));
+                }
+
+                return Option.forNames(
+                    new EquipAction(applyAction, ...options),
+                    ...weapon.pickupNames
+                );
+            }),
+            ...!this.usingFists()
+                ? Option.forNames(
+                    new PureAction(game => this.equipTwoHanded(this.fists, game)),
+                    ...this.fists.pickupNames)
+                : []
+        ];
+    }
+
+    unequipOptions(): Option[] {
+        return [
+            ...this.mainHand && !this.usingFists()
+                ? Option.forNames(
+                    new PureAction(game => this.unequipMainHand(game)),
+                    " main hand",
+                    ...this.mainHand.pickupNames)
+                : [],
+            ...this.offHand
+                ? Option.forNames(
+                    new PureAction(game => this.unequipOffHand(game)),
+                    " off hand",
+                    ...this.offHand.pickupNames)
+                : []
+        ];
     }
 
     equipToMainHand(weapon: Weapon, game?: Game) {
@@ -102,7 +176,7 @@ class Player extends Entity {
     unequipMainHand(game?: Game) {
         if (this.mainHand) {
             game?.log(`Unequiped ${this.mainHand.name}.`);
-            if (this.mainHand !== this.fists) {
+            if (!this.usingFists()) {
                 this.addItem(this.mainHand);
             }
             this.mainHand = undefined;
@@ -141,7 +215,7 @@ class Player extends Entity {
         this.removeItem(weapon);
     }
 
-    getWeaponsInInventory() {
+    private getWeaponsInInventory() {
         return this.inventory.filter(item => item instanceof Weapon)
             .map(item => item as Weapon);
     }

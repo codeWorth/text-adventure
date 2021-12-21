@@ -1,24 +1,16 @@
 import Game from "../../game/game";
-import Option from "../option";
-import ActionBuilder from "./actionBuilder";
+import TerminalAction from "./terminalAction";
 
-class LogAction implements ActionBuilder {
+class LogAction extends TerminalAction {
     private readonly message: string;
 
     constructor(message: string) {
+        super();
         this.message = message;
-    }
-
-    context(): Option[] {
-        return [];
     }
 
     apply(game: Game) {
         game.log(this.message);
-    }
-
-    terminal(): boolean {
-        return true;
     }
 }
 

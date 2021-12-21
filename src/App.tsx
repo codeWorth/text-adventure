@@ -82,7 +82,7 @@ function App() {
                 log(playerSetup.current.promptMessage());
             }
         } else if (gameScreen.current === GameScreen.GAMEPLAY && game.current !== null) {
-            game.current.handleInput(message);
+            game.current.handleInput(message.trimEnd());
             _setInputContent("");
             setSuggestion("");
         }

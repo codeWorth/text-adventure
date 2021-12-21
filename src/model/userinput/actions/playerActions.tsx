@@ -1,10 +1,12 @@
 import Game from "../../game/game";
-import { EquipHand } from "../../game/items/weapon";
+import { Weapon } from "../../game/items/weapon";
 import Player from "../../game/player";
 import Option from "../option";
 import ActionBuilder from "./actionBuilder";
+import LogAction from "./logAction";
 import OptionsBuilder from "./optionsBuilder";
 import PureAction from "./pureAction";
+import TerminalAction from "./terminalAction";
 
 class EquipAction implements ActionBuilder {
 
@@ -31,6 +33,66 @@ class EquipAction implements ActionBuilder {
     terminal(): boolean {
         return this.applyAction instanceof PureAction;
     }
+
+    usage(): string {
+        if (this.terminal()) {
+            return "";
+        } else {
+            return "<item>";
+        }
+    }
+}
+
+class ViewInventory extends TerminalAction {
+    apply(game: Game) {
+        game.player.printInventory(game);
+    }
+}
+
+class CombatHelpAction extends TerminalAction {
+
+    private readonly options: Option[];
+
+    constructor(...options: Option[]) {
+        super();
+        this.options = options;
+    }
+
+    apply(game: Game): void {
+        const namesList = this.options
+            .filter(option => option.hasTerminal())
+            .map(option => `    -  ${option.name} ${option.actionBuilder.usage()}`)
+            .join("\n");
+        game.log(`Abilities: \n${namesList}`);
+    }
+}
+
+class DetailsAction implements ActionBuilder {
+
+    private readonly weapons: Weapon[];
+
+    constructor(...weapons: Weapon[]) {
+        this.weapons = weapons;
+    }
+
+    context(): Option[] {
+        return this.weapons.flatMap(weapon => Option.forNames(
+            new LogAction(weapon.details()),
+            ...weapon.pickupNames
+        ));
+    }
+
+    apply(game: Game): void {
+        game.error("You must specify what item to get details on.");
+    }
+
+    terminal(): boolean {
+        return false;
+    }
+
+    usage(): string {
+        return "<item>";
+    }
 }
 
 class PlayerAction implements ActionBuilder {
@@ -43,70 +105,25 @@ class PlayerAction implements ActionBuilder {
 
     context() {
         if (this.player.inCombat) {
+            const combatOptions = this.player.combatOptions();
             return [
-                ...this.player.combatOptions()
+                ...combatOptions,
+                Option.forName("inventory", new ViewInventory()),
+                Option.forName("help", new CombatHelpAction(...combatOptions)),
+                Option.forName("details", new DetailsAction(...this.player.getWeapons()))
             ];
         } else {
-            const weapons = this.player.getWeaponsInInventory();
             return [
                 Option.forName("inventory", new ViewInventory()),
                 Option.forName("equip", new OptionsBuilder(
                     "You must specify which item to equip.",
-                    ...weapons.flatMap(weapon => {
-                        let applyAction: string | PureAction = "You must specify which hand to equip to.";
-                        const options = [];
-
-                        if (weapon.hand === EquipHand.BOTH) {
-                            applyAction = new PureAction(game => this.player.equipTwoHanded(weapon, game));
-                        }
-
-                        if (weapon.hand === EquipHand.MAIN || weapon.hand === EquipHand.ANY) {
-                            options.push(...Option.forNames(
-                                new PureAction(game => this.player.equipToMainHand(weapon, game)),
-                                " to main hand", 
-                                " main hand",
-                            ));
-                        }
-                        if (weapon.hand === EquipHand.OFF || weapon.hand === EquipHand.ANY) {
-                            options.push(...Option.forNames(
-                                new PureAction(game => this.player.equipToOffHand(weapon, game)),
-                                " to off hand", 
-                                " off hand",
-                            ));
-                        }
-
-                        if (weapon.hand === EquipHand.ANY && (!this.player.mainHand || this.player.mainHand === this.player.fists)) {
-                            applyAction = new PureAction(game => this.player.equipToMainHand(weapon, game));
-                        } else if (weapon.hand === EquipHand.ANY && !this.player.offHand) {
-                            applyAction = new PureAction(game => this.player.equipToOffHand(weapon, game));
-                        }
-
-                        return Option.forNames(
-                            new EquipAction(applyAction, ...options),
-                            ...weapon.pickupNames
-                        );
-                    }),
-                    ...this.player.mainHand !== this.player.fists
-                        ? Option.forNames(
-                            new PureAction(game => this.player.equipTwoHanded(this.player.fists, game)),
-                            ...this.player.fists.pickupNames)
-                        : []
+                    ...this.player.equipOptions()
                 )),
                 Option.forName("unequip", new OptionsBuilder(
                     "You must specify which hand to unequip.",
-                    ...this.player.mainHand && this.player.mainHand !== this.player.fists
-                        ? Option.forNames(
-                            new PureAction(game => this.player.unequipMainHand(game)),
-                            " main hand",
-                            ...this.player.mainHand.pickupNames)
-                        : [],
-                    ...this.player.offHand
-                        ? Option.forNames(
-                            new PureAction(game => this.player.unequipOffHand(game)),
-                            " off hand",
-                            ...this.player.offHand.pickupNames)
-                        : []
+                    ...this.player.unequipOptions()
                 )),
+                Option.forName("details", new DetailsAction(...this.player.getWeapons())),
                 Option.forName("unlockall", new PureAction(game => {
                     game.unlockAllRooms();
                     game.log("All doors have been unlocked!");
@@ -122,20 +139,10 @@ class PlayerAction implements ActionBuilder {
     terminal(): boolean {
         return false;
     }
-}
 
-class ViewInventory implements ActionBuilder {
-    context() {
-        return [];
-    }
-
-    apply(game: Game) {
-        game.player.printInventory(game);
-    }
-
-    terminal(): boolean {
-        return true;
+    usage(): string {
+        return "<command>";
     }
 }
 
-export default PlayerAction;
+export { PlayerAction, EquipAction };

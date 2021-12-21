@@ -13,7 +13,10 @@ enum TurnAction {
 }
 
 enum EquipHand {
-    ANY, MAIN, OFF, BOTH
+    ANY = "Any hand", 
+    MAIN = "Main hand only", 
+    OFF = "Off hand only", 
+    BOTH = "Two handed"
 }
 
 abstract class Weapon extends Item {
@@ -28,6 +31,8 @@ abstract class Weapon extends Item {
     }
 
     abstract options(player: Player): CombatOption[];
+
+    abstract details(): string;
 
     protected doDirectAttack(damage: number, stamina: number, source: Entity, target: Entity, game: Game) {
         if (source.setStamina(source.getStamina() - stamina)) {

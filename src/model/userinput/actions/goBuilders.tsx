@@ -2,6 +2,7 @@ import ActionBuilder from "./actionBuilder";
 import Game from "../../game/game";
 import Option from "../option";
 import Direction from "../direction";
+import TerminalAction from "./terminalAction";
 
 export class GoBuilder implements ActionBuilder {
     private readonly options: Option[];
@@ -22,24 +23,21 @@ export class GoBuilder implements ActionBuilder {
     terminal(): boolean {
         return false;
     }
+
+    usage(): string {
+        return "<direction>";
+    }
 }
 
-export class GoFinished implements ActionBuilder {
+export class GoFinished extends TerminalAction {
     readonly direction: Direction;
 
     constructor(direction: Direction) {
+        super();
         this.direction = direction;
-    }
-
-    context(): Option[] {
-        return [];
     }
 
     apply(game: Game) {
         game.go(this.direction);
-    }
-
-    terminal(): boolean {
-        return true;
     }
 }

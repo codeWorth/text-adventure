@@ -1,23 +1,16 @@
 import Game from "../../game/game";
-import ActionBuilder from "./actionBuilder";
+import TerminalAction from "./terminalAction";
 
-class PureAction implements ActionBuilder {
+class PureAction extends TerminalAction {
     private readonly action: (game: Game) => void;
 
     constructor(action: (game: Game) => void) {
+        super();
         this.action = action;
-    }
-
-    context() {
-        return [];
     }
 
     apply(game: Game) {
         this.action(game);
-    }
-
-    terminal(): boolean {
-        return true;
     }
 }
 

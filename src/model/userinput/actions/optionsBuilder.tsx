@@ -22,6 +22,10 @@ class OptionsBuilder implements ActionBuilder {
     terminal(): boolean {
         return false;
     }
+
+    usage(): string {
+        return `[${this.options.map(option => option.name.trim()).join("|")}]`;
+    }
 }
 
 export default OptionsBuilder;

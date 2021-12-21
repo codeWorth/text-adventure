@@ -11,15 +11,25 @@ class Option {
         this.consumed = consumed;
     }
 
-    public withConsumed(consumed: number) {
+    hasTerminal(): boolean {
+        return this.actionBuilder.terminal() 
+            || this.actionBuilder.context()
+                .some(option => option.hasTerminal());
+    }
+
+    prependSpace(): Option {
+        return new Option(" " + this.name, this.actionBuilder, this.consumed);
+    }
+
+    withConsumed(consumed: number) {
         return new Option(this.name, this.actionBuilder, consumed);
     }
 
-    public static forName(name: string, actionBuilder: ActionBuilder) {
+    static forName(name: string, actionBuilder: ActionBuilder) {
         return new Option(name, actionBuilder, 0);
     }
 
-    public static forNames(actionBuilder: ActionBuilder, ...names: string[]) {
+    static forNames(actionBuilder: ActionBuilder, ...names: string[]) {
         return names.map(name => this.forName(name, actionBuilder));
     }
 };
