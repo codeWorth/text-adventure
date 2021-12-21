@@ -6,10 +6,9 @@ import { Rooms, makeRooms } from "./rooms";
 import { parseInput, ParseResponseType } from "../userinput/input";
 import ActionBuilder from "../userinput/actions/actionBuilder";
 import { CombinedContextBuilder } from "../userinput/actions/combinedBuilders";
-import { WeaponAction } from "./items/weapon";
+import { TurnAction } from "./items/weapon";
 import Enemy from "./enemies/enemy";
 import EmptyAction from "../userinput/actions/emptyAction";
-import { nonNull } from "../../util";
 
 export enum InputMode {
     COMMANDS, TEXT, GAME_OVER
@@ -76,46 +75,22 @@ class Game {
         this.enter(connection.getDestination(this.currentRoom));
     }
 
-    /*
-    Assumptions:
-        If only one action is happening this turn, it happens in main hand
-        Only normal attacks may happen in both hands
-    */
-    executeTurn(playerAction: WeaponAction, target?: Enemy) {
+    // enemy turn must be executed before player turn, or else enemy action might change in an unexpected way
+    enemyTurn(playerAction: TurnAction, target?: Enemy) {
         if (target && !this.player.getCombatEnemies().includes(target)) return;
 
-        const enemyActions = nonNull(
-            ...this.player.getCombatEnemies() // eslint-disable-next-line
-                .map(enemy => {
-                    const action = this.enemyTurn(playerAction, enemy);
-                    if (enemy === target) {
-                        return action;
-                    }
-                })
-        );
-
-        if (playerAction === WeaponAction.REST) {
-            this.player.rest(this);
-        } else if (playerAction !== WeaponAction.NONE && target) {
-            // This index cannot fail because of condition at the beginning of this method
-            this.player.mainHand?.attack(enemyActions[0], this.player, target, this);
-            this.player.offHand?.attack(enemyActions[0], this.player, target, this);
-        }
-
-        this.player.getCombatEnemies()
-            .forEach(enemy => enemy.printBattleInfo(this));
-        this.player.printBattleInfo(this);
+        this.player.getCombatEnemies().forEach(enemy => {
+            if (enemy === target) {
+                enemy.executeTurn(playerAction, this);
+            } else {
+                enemy.executeTurn(TurnAction.NONE, this);
+            }
+        });
     }
 
-    private enemyTurn(playerAction: WeaponAction, enemy: Enemy): WeaponAction {
-        const enemyAction = enemy.decideAction(this);
-        if (enemyAction === WeaponAction.REST) {
-            enemy.rest(this);
-        } else if (enemyAction !== WeaponAction.NONE) {
-            enemy.mainHand?.attack(playerAction, enemy, this.player, this);
-            enemy.offHand?.attack(playerAction, enemy, this.player, this);
-        }
-        return enemyAction;
+    finishTurn() {
+        this.player.printBattleInfo(this);
+        this.player.getCombatEnemies().forEach(enemy => enemy.printBattleInfo(this));
     }
 
     enterCombat(...enemies: Enemy[]) {

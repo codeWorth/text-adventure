@@ -5,7 +5,7 @@ class Option {
     public readonly actionBuilder: ActionBuilder;
     public readonly consumed: number;
 
-    private constructor(name: string, actionBuilder: ActionBuilder, consumed: number) {
+    protected constructor(name: string, actionBuilder: ActionBuilder, consumed: number) {
         this.name = name;
         this.actionBuilder = actionBuilder;
         this.consumed = consumed;

@@ -1,8 +1,8 @@
+import { assertUnreachable } from "../../../util";
 import Entity from "../entity";
 import Game from "../game";
-import Player from "../player";
 import NormalWeapon from "./normalWeapon";
-import { EquipHand, WeaponAction } from "./weapon";
+import { EquipHand, TurnAction, WeaponType } from "./weapon";
 
 class BasicNormalWeapon extends NormalWeapon {
 
@@ -10,21 +10,39 @@ class BasicNormalWeapon extends NormalWeapon {
     public stamina: number;
 
     constructor(name: string, pickupNames: string[], damage: number, stamina: number, hand?: EquipHand) {
-        super(name, pickupNames, hand);
+        super(name, pickupNames, WeaponType.NORMAL, hand || EquipHand.ANY);
         this.damage = damage;
         this.stamina = stamina;
     }
 
-    attack(otherAction: WeaponAction, source: Entity, target: Entity, game: Game): void {
-        if (this.canAttack(otherAction)) {
-            if (source.setStamina(source.getStamina() - this.stamina)) {
-                game.log(`${source.name} attacked ${target.name} for ${this.damage} damage!`);
-                target.setHealth(target.getHealth() - this.damage);
-            } else if (source instanceof Player) {
-                game.log("You are too tired to do that!");
-            }
-        } else {
-            // :)
+    attack(source: Entity, target: Entity, targetAction: TurnAction, game: Game): void {
+        switch (targetAction) {
+            case TurnAction.NORMAL_ATTACK:
+                this.doDirectAttack(this.damage, this.stamina, source, target, game);
+                break;
+            case TurnAction.LIGHT_ATTACK:
+                this.doDirectAttack(this.damage, this.stamina, source, target, game);
+                break;
+            case TurnAction.HEAVY_ATTACK:
+                this.doDirectAttack(this.damage, this.stamina, source, target, game);
+                break;
+            case TurnAction.REST:
+                this.doDirectAttack(this.damage, this.stamina, source, target, game);
+                break;
+            case TurnAction.NONE:
+                this.doDirectAttack(this.damage, this.stamina, source, target, game);
+                break;
+            case TurnAction.BASH:
+                console.log("LMAO rolled");
+                break;
+            case TurnAction.PARRY:
+                console.log("LMAO rolled");
+                break;
+            case TurnAction.BLOCK:
+                console.log("LMAO rolled");
+                break;
+            default:
+                assertUnreachable(targetAction);
         }
     }
 }

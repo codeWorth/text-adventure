@@ -1,4 +1,5 @@
 import PlayerConfig from "../playerConfig";
+import { CombatOption } from "../userinput/actions/combatActions";
 import OptionsBuilder from "../userinput/actions/optionsBuilder";
 import PlayerAction from "../userinput/actions/playerActions";
 import PureAction from "../userinput/actions/pureAction";
@@ -9,7 +10,7 @@ import Game from "./game";
 import BasicNormalWeapon from "./items/basicNormalWeapon";
 import Item from "./items/item";
 import Key from "./items/key";
-import { ATTACK_MAP, EquipHand, Weapon, WeaponAction } from "./items/weapon";
+import { EquipHand, Weapon } from "./items/weapon";
 
 const STAMINA_REST_AMOUNT = 2;
 
@@ -44,30 +45,38 @@ class Player extends Entity {
         this.combatEnemies = this.combatEnemies.filter(e => e !== enemy);
     }
 
-    attackOption(): Option | undefined {
-        if (this.canAttack()) {
-            if (this.combatEnemies.length === 1) {
-                return Option.forName("attack", new PureAction(game => {
-                    game.executeTurn(this.mainHand ? ATTACK_MAP[this.mainHand.type] : WeaponAction.NONE, this.combatEnemies[0]);
-                }));
-            } else if (this.combatEnemies.length > 1) {
-                return Option.forName("attack", new OptionsBuilder(
-                    "You must specify which enemy to attack.",
-                    ...this.combatEnemies.map(enemy => Option.forName(
-                        enemy.name,
-                        new PureAction(game => {
-                            game.executeTurn(this.mainHand ? ATTACK_MAP[this.mainHand.type] : WeaponAction.NONE, enemy);
-                        })
-                    ))
-                ));
-            }
-        }
-    }
+    combatOptions(): Option[] {
+        const mainOptions: CombatOption[] = this.mainHand?.options(this) || [];
+        const offOptions: CombatOption[] = this.offHand?.options(this) || [];
 
-    restOption() {
-        return Option.forName("rest", new PureAction(game => {
-            game.executeTurn(WeaponAction.REST);
-        }));
+        const mainNames = new Set(mainOptions.map(option => option.name));
+        const offNames = new Set(offOptions.map(option => option.name));
+
+        const onlyMainOptions: CombatOption[] = mainOptions.filter(option => !offNames.has(option.name));
+        const onlyOffOptions: CombatOption[] = mainOptions.filter(option => !mainNames.has(option.name));
+
+        return [
+            ...onlyMainOptions,
+            ...onlyOffOptions,
+            Option.forName(
+                "main hand ",
+                new OptionsBuilder(
+                    "You must specify the action to take.",
+                    ...mainOptions
+                )
+            ),
+            Option.forName(
+                "off hand ",
+                new OptionsBuilder(
+                    "You must specify the action to take.",
+                    ...offOptions
+                )
+            ),
+            Option.forName(
+                "rest",
+                new PureAction(game => this.rest(game))
+            )
+        ];
     }
 
     rest(game: Game) {

@@ -1,25 +1,20 @@
+import { CombatOption } from "../../userinput/actions/combatActions";
 import Entity from "../entity";
 import Game from "../game";
+import Player from "../player";
 import Item from "./item"
 
 enum WeaponType {
     LIGHT, NORMAL, HEAVY, OTHER
 }
 
-enum WeaponAction {
+enum TurnAction {
     NORMAL_ATTACK, BLOCK, LIGHT_ATTACK, PARRY, HEAVY_ATTACK, BASH, REST, NONE
 }
 
 enum EquipHand {
     ANY, MAIN, OFF, BOTH
 }
-
-const ATTACK_MAP = {
-    [WeaponType.LIGHT]: WeaponAction.LIGHT_ATTACK,
-    [WeaponType.NORMAL]: WeaponAction.NORMAL_ATTACK,
-    [WeaponType.HEAVY]: WeaponAction.HEAVY_ATTACK,
-    [WeaponType.OTHER]: WeaponAction.NONE
-};
 
 abstract class Weapon extends Item {
 
@@ -32,7 +27,16 @@ abstract class Weapon extends Item {
         this.hand = hand;
     }
 
-    abstract attack(otherAction: WeaponAction, source: Entity, target: Entity, game: Game): void;
+    abstract options(player: Player): CombatOption[];
+
+    protected doDirectAttack(damage: number, stamina: number, source: Entity, target: Entity, game: Game) {
+        if (source.setStamina(source.getStamina() - stamina)) {
+            game.log(`${source.name} attacked ${target.name} for ${damage} damage!`);
+            target.setHealth(target.getHealth() - damage);
+        } else if (source instanceof Player) {
+            game.log("You are too tired to do that!");
+        }
+    }
 }
 
-export { Weapon, WeaponType, WeaponAction, EquipHand, ATTACK_MAP };
+export { Weapon, WeaponType, TurnAction, EquipHand };

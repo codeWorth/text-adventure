@@ -1,9 +1,10 @@
 import Entity from "../entity";
 import Game from "../game";
-import { WeaponAction } from "../items/weapon";
+import { TurnAction } from "../items/weapon";
 
 abstract class Enemy extends Entity {
-    abstract decideAction(game: Game): WeaponAction;
+    abstract decideAction(game: Game): TurnAction;
+    abstract executeTurn(playerAction: TurnAction, game: Game): void;
 
     rest(game: Game) {
         game.log(`${this.name} took a moment to rest.`);

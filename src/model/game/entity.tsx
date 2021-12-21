@@ -8,6 +8,7 @@ class Entity {
     private stamina: number;
     private maxHealth: number;
     private maxStamina: number;
+    public stunned: boolean;
 
     public mainHand?: Weapon;
     public offHand?: Weapon;
@@ -20,6 +21,7 @@ class Entity {
         this.health = maxHealth;
         this.maxStamina = maxStamina;
         this.stamina = maxStamina;
+        this.stunned = false;
         this.deathListeners = [];
     }
 
@@ -28,6 +30,7 @@ class Entity {
     }
 
     canAttack(): boolean {
+        if (this.stunned) return false;
         const fists = !this.mainHand && !this.offHand;
         const normalWeapon = this.mainHand?.type === WeaponType.NORMAL || this.offHand?.type === WeaponType.NORMAL;
         return fists || normalWeapon;

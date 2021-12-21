@@ -42,73 +42,77 @@ class PlayerAction implements ActionBuilder {
     }
 
     context() {
-        if (this.player.inCombat) return [];
-        
-        const weapons = this.player.getWeaponsInInventory();
-        return [
-            Option.forName("inventory", new ViewInventory()),
-            Option.forName("equip", new OptionsBuilder(
-                "You must specify which item to equip.",
-                ...weapons.flatMap(weapon => {
-                    let applyAction: string | PureAction = "You must specify which hand to equip to.";
-                    const options = [];
+        if (this.player.inCombat) {
+            return [
+                ...this.player.combatOptions()
+            ];
+        } else {
+            const weapons = this.player.getWeaponsInInventory();
+            return [
+                Option.forName("inventory", new ViewInventory()),
+                Option.forName("equip", new OptionsBuilder(
+                    "You must specify which item to equip.",
+                    ...weapons.flatMap(weapon => {
+                        let applyAction: string | PureAction = "You must specify which hand to equip to.";
+                        const options = [];
 
-                    if (weapon.hand === EquipHand.BOTH) {
-                        applyAction = new PureAction(game => this.player.equipTwoHanded(weapon, game));
-                    }
+                        if (weapon.hand === EquipHand.BOTH) {
+                            applyAction = new PureAction(game => this.player.equipTwoHanded(weapon, game));
+                        }
 
-                    if (weapon.hand === EquipHand.MAIN || weapon.hand === EquipHand.ANY) {
-                        options.push(...Option.forNames(
-                            new PureAction(game => this.player.equipToMainHand(weapon, game)),
-                            " to main hand", 
+                        if (weapon.hand === EquipHand.MAIN || weapon.hand === EquipHand.ANY) {
+                            options.push(...Option.forNames(
+                                new PureAction(game => this.player.equipToMainHand(weapon, game)),
+                                " to main hand", 
+                                " main hand",
+                            ));
+                        }
+                        if (weapon.hand === EquipHand.OFF || weapon.hand === EquipHand.ANY) {
+                            options.push(...Option.forNames(
+                                new PureAction(game => this.player.equipToOffHand(weapon, game)),
+                                " to off hand", 
+                                " off hand",
+                            ));
+                        }
+
+                        if (weapon.hand === EquipHand.ANY && (!this.player.mainHand || this.player.mainHand === this.player.fists)) {
+                            applyAction = new PureAction(game => this.player.equipToMainHand(weapon, game));
+                        } else if (weapon.hand === EquipHand.ANY && !this.player.offHand) {
+                            applyAction = new PureAction(game => this.player.equipToOffHand(weapon, game));
+                        }
+
+                        return Option.forNames(
+                            new EquipAction(applyAction, ...options),
+                            ...weapon.pickupNames
+                        );
+                    }),
+                    ...this.player.mainHand !== this.player.fists
+                        ? Option.forNames(
+                            new PureAction(game => this.player.equipTwoHanded(this.player.fists, game)),
+                            ...this.player.fists.pickupNames)
+                        : []
+                )),
+                Option.forName("unequip", new OptionsBuilder(
+                    "You must specify which hand to unequip.",
+                    ...this.player.mainHand && this.player.mainHand !== this.player.fists
+                        ? Option.forNames(
+                            new PureAction(game => this.player.unequipMainHand(game)),
                             " main hand",
-                        ));
-                    }
-                    if (weapon.hand === EquipHand.OFF || weapon.hand === EquipHand.ANY) {
-                        options.push(...Option.forNames(
-                            new PureAction(game => this.player.equipToOffHand(weapon, game)),
-                            " to off hand", 
+                            ...this.player.mainHand.pickupNames)
+                        : [],
+                    ...this.player.offHand
+                        ? Option.forNames(
+                            new PureAction(game => this.player.unequipOffHand(game)),
                             " off hand",
-                        ));
-                    }
-
-                    if (weapon.hand === EquipHand.ANY && (!this.player.mainHand || this.player.mainHand === this.player.fists)) {
-                        applyAction = new PureAction(game => this.player.equipToMainHand(weapon, game));
-                    } else if (weapon.hand === EquipHand.ANY && !this.player.offHand) {
-                        applyAction = new PureAction(game => this.player.equipToOffHand(weapon, game));
-                    }
-
-                    return Option.forNames(
-                        new EquipAction(applyAction, ...options),
-                        ...weapon.pickupNames
-                    );
-                }),
-                ...this.player.mainHand !== this.player.fists
-                    ? Option.forNames(
-                        new PureAction(game => this.player.equipTwoHanded(this.player.fists, game)),
-                        ...this.player.fists.pickupNames)
-                    : []
-            )),
-            Option.forName("unequip", new OptionsBuilder(
-                "You must specify which hand to unequip.",
-                ...this.player.mainHand && this.player.mainHand !== this.player.fists
-                    ? Option.forNames(
-                        new PureAction(game => this.player.unequipMainHand(game)),
-                        " main hand",
-                        ...this.player.mainHand.pickupNames)
-                    : [],
-                ...this.player.offHand
-                    ? Option.forNames(
-                        new PureAction(game => this.player.unequipOffHand(game)),
-                        " off hand",
-                        ...this.player.offHand.pickupNames)
-                    : []
-            )),
-            Option.forName("unlockall", new PureAction(game => {
-                game.unlockAllRooms();
-                game.log("All doors have been unlocked!");
-            }))
-        ];
+                            ...this.player.offHand.pickupNames)
+                        : []
+                )),
+                Option.forName("unlockall", new PureAction(game => {
+                    game.unlockAllRooms();
+                    game.log("All doors have been unlocked!");
+                }))
+            ];
+        }
     }
 
     apply(game: Game) {

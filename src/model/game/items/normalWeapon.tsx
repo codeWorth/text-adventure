@@ -1,22 +1,23 @@
-import { EquipHand, Weapon, WeaponAction, WeaponType } from "./weapon";
+import { CombatOption, TargetedCombatAction } from "../../userinput/actions/combatActions";
+import Entity from "../entity";
+import Game from "../game";
+import Player from "../player";
+import { TurnAction, Weapon } from "./weapon";
 
 abstract class NormalWeapon extends Weapon {
-    
-    constructor(name: string, pickupNames: string[], hand?: EquipHand) {
-        super(name, pickupNames, WeaponType.NORMAL, hand || EquipHand.ANY);
+
+    options(player: Player): CombatOption[] {
+        return [CombatOption.forName(
+            "attack",
+            new TargetedCombatAction(
+                player,
+                TurnAction.NORMAL_ATTACK,
+                (target, targetAction, game) => this.attack(game.player, target, targetAction, game)
+            )
+        )];
     }
 
-    canMainHand(): boolean {
-        return true;
-    }
-
-    canOffHand(): boolean {
-        return true;
-    }
-
-    canAttack(otherAction: WeaponAction): boolean {
-        return [WeaponAction.LIGHT_ATTACK, WeaponAction.NORMAL_ATTACK, WeaponAction.HEAVY_ATTACK, WeaponAction.REST, WeaponAction.NONE].includes(otherAction);
-    }
+    abstract attack(source: Entity, target: Entity, targetAction: TurnAction, game: Game): void;
 }
 
 export default NormalWeapon;
