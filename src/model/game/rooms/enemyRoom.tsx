@@ -24,8 +24,8 @@ class EnemyRoom extends Room {
     getOptions(game: Game): Option[] {
         if (game.player.inCombat) {
             return nonNull(
-                game.player.attackOption(this.enemy),
-                game.player.restOption(this.enemy)
+                game.player.attackOption(),
+                game.player.restOption()
             );
         } else {
             return [

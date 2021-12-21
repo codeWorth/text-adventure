@@ -1,4 +1,5 @@
 import PlayerConfig from "../playerConfig";
+import OptionsBuilder from "../userinput/actions/optionsBuilder";
 import PlayerAction from "../userinput/actions/playerActions";
 import PureAction from "../userinput/actions/pureAction";
 import Option from "../userinput/option";
@@ -35,21 +36,37 @@ class Player extends Entity {
         enemies.forEach(enemy => enemy.addDeathListener(() => this.removeEnemy(enemy)));
     }
 
+    getCombatEnemies() {
+        return this.combatEnemies;
+    }
+
     private removeEnemy(enemy: Enemy) {
         this.combatEnemies = this.combatEnemies.filter(e => e !== enemy);
     }
 
-    attackOption(enemy: Enemy): Option | undefined {
+    attackOption(): Option | undefined {
         if (this.canAttack()) {
-            return Option.forName("attack", new PureAction(game => {
-                game.attackTurn(this.mainHand ? ATTACK_MAP[this.mainHand.type] : WeaponAction.NONE, enemy);
-            }))
+            if (this.combatEnemies.length === 1) {
+                return Option.forName("attack", new PureAction(game => {
+                    game.executeTurn(this.mainHand ? ATTACK_MAP[this.mainHand.type] : WeaponAction.NONE, this.combatEnemies[0]);
+                }));
+            } else if (this.combatEnemies.length > 1) {
+                return Option.forName("attack", new OptionsBuilder(
+                    "You must specify which enemy to attack.",
+                    ...this.combatEnemies.map(enemy => Option.forName(
+                        enemy.name,
+                        new PureAction(game => {
+                            game.executeTurn(this.mainHand ? ATTACK_MAP[this.mainHand.type] : WeaponAction.NONE, enemy);
+                        })
+                    ))
+                ));
+            }
         }
     }
 
-    restOption(enemy: Enemy) {
+    restOption() {
         return Option.forName("rest", new PureAction(game => {
-            game.attackTurn(WeaponAction.REST, enemy);
+            game.executeTurn(WeaponAction.REST);
         }));
     }
 
