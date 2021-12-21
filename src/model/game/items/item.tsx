@@ -4,7 +4,9 @@ class Item {
 
     constructor(name: string, pickupNames: string[]) {
         this.name = name;
-        this.pickupNames = Array.from(new Set([name, ...pickupNames]));
+        this.pickupNames = Array.from(new Set(
+            [name, ...pickupNames].map(name => " " + name.toLowerCase())
+        ));
     }
 };
 

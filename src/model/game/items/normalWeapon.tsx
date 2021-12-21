@@ -1,9 +1,9 @@
-import { Weapon, WeaponType } from "./weapon";
+import { EquipHand, Weapon, WeaponAction, WeaponType } from "./weapon";
 
 abstract class NormalWeapon extends Weapon {
     
-    constructor(name: string, pickupNames: string[]) {
-        super(name, pickupNames, WeaponType.NORMAL);
+    constructor(name: string, pickupNames: string[], hand?: EquipHand) {
+        super(name, pickupNames, WeaponType.NORMAL, hand || EquipHand.ANY);
     }
 
     canMainHand(): boolean {
@@ -12,6 +12,10 @@ abstract class NormalWeapon extends Weapon {
 
     canOffHand(): boolean {
         return true;
+    }
+
+    canAttack(otherAction: WeaponAction): boolean {
+        return [WeaponAction.LIGHT_ATTACK, WeaponAction.NORMAL_ATTACK, WeaponAction.HEAVY_ATTACK, WeaponAction.REST, WeaponAction.NONE].includes(otherAction);
     }
 }
 

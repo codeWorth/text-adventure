@@ -52,31 +52,27 @@ class TakeableItems {
 
     getLookAtOptions(): Option[] {
         const presentItems = this.presentItems();
-        return presentItems.flatMap(itemEntry => itemEntry.item.pickupNames.map(name => 
-            Option.forName(
-                " " + name.toLowerCase(), 
-                new CombinedApplyBuilder(
-                    new LogAction(itemEntry.lookMessage),
-                    new PureAction(() => itemEntry.state = ItemState.KNOWN)
-                )
-            )
+        return presentItems.flatMap(itemEntry => Option.forNames(
+            new CombinedApplyBuilder(
+                new LogAction(itemEntry.lookMessage),
+                new PureAction(() => itemEntry.state = ItemState.KNOWN)
+            ),
+            ...itemEntry.item.pickupNames
         ));
     }
 
     getTakeOptions(player: Player): Option[] {
         return this.knownItems().flatMap(itemEntry => 
-            itemEntry.item.pickupNames.map(name => 
-                Option.forName(
-                    " " + name.toLowerCase(),
-                    new CombinedApplyBuilder(...nonNull<ActionBuilder>(
-                        map(itemEntry.pickupMessage, msg => new LogAction(msg)),
-                        new LogAction(`You pick up the ${itemEntry.item.name}.`),
-                        new PureAction(() => {
-                            itemEntry.state = ItemState.TAKEN;
-                            player.addItem(itemEntry.item);
-                        })
-                    ))
-                )
+            Option.forNames(
+                new CombinedApplyBuilder(...nonNull<ActionBuilder>(
+                    map(itemEntry.pickupMessage, msg => new LogAction(msg)),
+                    new LogAction(`You pick up the ${itemEntry.item.name}.`),
+                    new PureAction(() => {
+                        itemEntry.state = ItemState.TAKEN;
+                        player.addItem(itemEntry.item);
+                    })
+                )),
+                ...itemEntry.item.pickupNames
             )
         );
     }

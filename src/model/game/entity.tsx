@@ -28,7 +28,9 @@ class Entity {
     }
 
     canAttack(): boolean {
-        return this.mainHand?.type === WeaponType.NORMAL || this.offHand?.type === WeaponType.NORMAL;
+        const fists = !this.mainHand && !this.offHand;
+        const normalWeapon = this.mainHand?.type === WeaponType.NORMAL || this.offHand?.type === WeaponType.NORMAL;
+        return fists || normalWeapon;
     }
 
     getHealth() {

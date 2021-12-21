@@ -2,7 +2,7 @@ import LookBuilder from "../../userinput/actions/lookBuilder";
 import OptionsBuilder from "../../userinput/actions/optionsBuilder";
 import Option from "../../userinput/option";
 import Game from "../game";
-import Torch from "../items/torch";
+import BasicNormalWeapon from "../items/basicNormalWeapon";
 import Room from "../room";
 import TakeableItems from "./takeableItems";
 
@@ -14,7 +14,7 @@ class StartRoom extends Room {
         super("a dark stone cell.");
         this.takeableItems = new TakeableItems(
             {
-                item: new Torch("Mysterious Torch", ["torch"]),
+                item: new BasicNormalWeapon("Mysterious Torch", ["torch"], 2, 2),
                 lookMessage: "The torch is affixed to the wall with a sturdy iron bracket. Looking closely at the flame, it doesn't seem to be burning from some fuel source. Instead, the flame simply hovers in the basin of the torch.",
                 pickupMessage: "With a bit of effort, you're able to yank the torch out of its holder."
             }
