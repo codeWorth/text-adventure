@@ -22,7 +22,7 @@ function App() {
     const game = useRef<Game | null>(null);
 
     useEffect(() => {
-        log(playerSetup.current.promptMessage());
+        log(playerSetup.current.promptMessage()); // eslint-disable-next-line
     }, []);
 
     function log(message: string) {

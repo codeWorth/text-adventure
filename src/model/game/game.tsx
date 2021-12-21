@@ -85,7 +85,7 @@ class Game {
         if (target && !this.player.getCombatEnemies().includes(target)) return;
 
         const enemyActions = nonNull(
-            ...this.player.getCombatEnemies()
+            ...this.player.getCombatEnemies() // eslint-disable-next-line
                 .map(enemy => {
                     const action = this.enemyTurn(playerAction, enemy);
                     if (enemy === target) {
