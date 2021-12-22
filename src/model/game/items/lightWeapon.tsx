@@ -3,9 +3,13 @@ import { CombatOption, TargetedCombatAction } from "../../userinput/actions/comb
 import Entity from "../entity";
 import Game from "../game";
 import Player from "../player";
-import { Weapon, TurnAction, WeaponType } from "./weapon";
+import { Weapon, TurnAction, WeaponType, EquipHand } from "./weapon";
 
 abstract class LightWeapon extends Weapon {
+
+    constructor(name: string, pickupNames: string[], stamina: number, hand: EquipHand) {
+        super(name, pickupNames, stamina, WeaponType.LIGHT, hand);
+    }
 
     options(player: Player): CombatOption[] {
         return nonNull(
@@ -14,7 +18,8 @@ abstract class LightWeapon extends Weapon {
                 new TargetedCombatAction(
                     player,
                     TurnAction.LIGHT_ATTACK,
-                    passFirst(player, this.attack)
+                    this.stamina,
+                    passFirst(player, this.attack.bind(this))
                 )
             ),
             this.canParry(player)
@@ -23,7 +28,8 @@ abstract class LightWeapon extends Weapon {
                     new TargetedCombatAction(
                         player,
                         TurnAction.PARRY,
-                        passFirst(player, this.parry)
+                        this.stamina,
+                        passFirst(player, this.parry.bind(this))
                     )
                 )
                 : undefined

@@ -7,8 +7,8 @@ import { EquipHand, TurnAction, Weapon, WeaponType } from "./weapon";
 
 abstract class NormalWeapon extends Weapon {
 
-    constructor(name: string, pickupNames: string[], hand: EquipHand) {
-        super(name, pickupNames, WeaponType.NORMAL, hand);
+    constructor(name: string, pickupNames: string[], stamina: number, hand: EquipHand) {
+        super(name, pickupNames, stamina, WeaponType.NORMAL, hand);
     }
 
     options(player: Player): CombatOption[] {
@@ -17,7 +17,8 @@ abstract class NormalWeapon extends Weapon {
             new TargetedCombatAction(
                 player,
                 TurnAction.NORMAL_ATTACK,
-                passFirst(player, this.attack)
+                this.stamina,
+                passFirst(player, this.attack.bind(this))
             )
         )];
     }

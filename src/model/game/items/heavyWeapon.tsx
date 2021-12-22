@@ -3,11 +3,16 @@ import { CombatOption, TargetedCombatAction, UntargetedCombatAction } from "../.
 import Entity from "../entity";
 import Game from "../game";
 import Player from "../player";
-import { TurnAction, Weapon } from "./weapon";
+import { EquipHand, TurnAction, Weapon, WeaponType } from "./weapon";
 
 abstract class HeavyWeapon extends Weapon {
 
-    private prepared: boolean = false;
+    private prepared: boolean;
+
+    constructor(name: string, pickupNames: string[], stamina: number, hand: EquipHand) {
+        super(name, pickupNames, stamina, WeaponType.HEAVY, hand);
+        this.prepared = false;
+    }
 
     options(player: Player): CombatOption[] {
         return nonNull(
@@ -15,7 +20,8 @@ abstract class HeavyWeapon extends Weapon {
                 "prepare",
                 new UntargetedCombatAction(
                     TurnAction.PREPARE,
-                    passFirst(player, this.prepare)
+                    this.stamina,
+                    passFirst(player, this.prepare.bind(this))
                 )
             ),
             this.prepared
@@ -24,7 +30,8 @@ abstract class HeavyWeapon extends Weapon {
                     new TargetedCombatAction(
                         player,
                         TurnAction.NORMAL_ATTACK,
-                        passFirst(player, this.attack)
+                        this.stamina,
+                        passFirst(player, this.attack.bind(this))
                     )
                 )
                 : undefined
@@ -61,6 +68,10 @@ abstract class HeavyWeapon extends Weapon {
             this.prepared = true;
             game.log(`${source.name} prepares to strike.`);
         }
+    }
+
+    finishTurn(owner: Entity, game: Game): void {
+        this.prepared = false;
     }
 
     abstract attack(source: Entity, target: Entity, targetAction: TurnAction, game: Game, incomingActions: TurnAction[]): void;

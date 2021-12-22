@@ -2,17 +2,15 @@ import { assertUnreachable } from "../../../util";
 import Entity from "../entity";
 import Game from "../game";
 import NormalWeapon from "./normalWeapon";
-import { EquipHand, TurnAction, WeaponType } from "./weapon";
+import { EquipHand, TurnAction } from "./weapon";
 
 class BasicNormalWeapon extends NormalWeapon {
 
-    public damage: number;
-    public stamina: number;
+    private readonly damage: number;
 
     constructor(name: string, pickupNames: string[], damage: number, stamina: number, hand?: EquipHand) {
-        super(name, pickupNames, hand || EquipHand.ANY);
+        super(name, pickupNames, stamina, hand || EquipHand.ANY);
         this.damage = damage;
-        this.stamina = stamina;
     }
 
     details(): string {
@@ -23,6 +21,7 @@ Equip slot: ${this.hand}`;
     }
 
     attack(source: Entity, target: Entity, targetAction: TurnAction, game: Game, incomingActions: TurnAction[]): void {
+        source.decreaseStamina(this.stamina);
         switch (targetAction) {
             case TurnAction.NORMAL_ATTACK:
                 this.doDirectAttack(this.damage, this.stamina, source, target, game);
@@ -40,13 +39,21 @@ Equip slot: ${this.hand}`;
                 this.doDirectAttack(this.damage, this.stamina, source, target, game);
                 break;
             case TurnAction.BASH:
-                console.log("LMAO rolled");
+                if (target.isBlocking(source)) {
+                    this.doDirectAttack(0, this.stamina, source, target, game);
+                } else {
+                    this.doDirectAttack(this.damage, this.stamina, source, target, game);
+                }
                 break;
             case TurnAction.PARRY:
                 console.log("LMAO rolled");
                 break;
             case TurnAction.BLOCK:
-                console.log("LMAO rolled");
+                if (target.isBlocking(source)) {
+                    this.doDirectAttack(0, this.stamina, source, target, game);
+                } else {
+                    this.doDirectAttack(this.damage, this.stamina, source, target, game);
+                }
                 break;
             case TurnAction.PREPARE:
                 this.doDirectAttack(this.damage, this.stamina, source, target, game);
