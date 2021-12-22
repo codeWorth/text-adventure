@@ -116,12 +116,12 @@ class Game {
             enemy.finishTurn(this);
         });
 
-        this.player.printBattleInfo(this);
-        this.player.getCombatEnemies().forEach(enemy => enemy.printBattleInfo(this));
-
         if (!this.player.inCombat) {
             this.player.replenishStamina();
         }
+
+        this.player.printBattleInfo(this);
+        this.player.getCombatEnemies().forEach(enemy => enemy.printBattleInfo(this));
     }
 
     enterCombat(...enemies: Enemy[]) {
