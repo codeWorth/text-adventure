@@ -76,9 +76,11 @@ class Game {
     }
 
     // enemy turn must be executed before player turn, or else enemy action might change in an unexpected way
-    enemyTurn(playerAction: TurnAction, target?: Enemy) {
-        if (target && !this.player.getCombatEnemies().includes(target)) return;
+    enemyTurn(playerAction: TurnAction, target?: Enemy): TurnAction[] {
+        if (target && !this.player.getCombatEnemies().includes(target)) return [];
 
+        const actions = this.player.getCombatEnemies()
+            .map(enemy => enemy.decideAction(this));
         this.player.getCombatEnemies().forEach(enemy => {
             if (enemy === target) {
                 enemy.executeTurn(playerAction, this);
@@ -86,9 +88,18 @@ class Game {
                 enemy.executeTurn(TurnAction.NONE, this);
             }
         });
+        return actions;
     }
 
     finishTurn() {
+        this.player.mainHand?.finishTurn(this.player, this);
+        this.player.offHand?.finishTurn(this.player, this);
+
+        this.player.getCombatEnemies().forEach(enemy => {
+            enemy.mainHand?.finishTurn(enemy, this);
+            enemy.offHand?.finishTurn(enemy, this);
+        });
+
         this.player.printBattleInfo(this);
         this.player.getCombatEnemies().forEach(enemy => enemy.printBattleInfo(this));
     }

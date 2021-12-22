@@ -1,0 +1,22 @@
+Updates for 12/21/2021
+Bugs:
+-the large iron key does not disappear from inventory after opening the locked door
+-text does not update when taking the rusty sword from the skele
+
+General Tasks:
+-center the entire terminal window (not sure if this is easy to do or hard)
+-when going into a new room, create a divider and then scroll the previous screen's info up so that it looks as if there is a new screen
+    -go into a new screen when battling, same as the new room screen except scoll down each battle turn
+    -when the player goes to the inventory, also create a divider screen like the new room and battle screen
+-make using too much stamina more friendly
+    -right now, if you try to do an attack and you don't have enough stamina, it simply fails
+    -the enemy still gets to attack
+    -perhaps it shouldn't waste the turn, and instead warn the player that they don't have enough stamina
+
+In battle screen
+-get rid of the "Name:" text
+-Move the enemy text above the player text
+
+
+
+

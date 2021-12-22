@@ -10,7 +10,7 @@ class BasicNormalWeapon extends NormalWeapon {
     public stamina: number;
 
     constructor(name: string, pickupNames: string[], damage: number, stamina: number, hand?: EquipHand) {
-        super(name, pickupNames, WeaponType.NORMAL, hand || EquipHand.ANY);
+        super(name, pickupNames, hand || EquipHand.ANY);
         this.damage = damage;
         this.stamina = stamina;
     }
@@ -18,11 +18,11 @@ class BasicNormalWeapon extends NormalWeapon {
     details(): string {
         return `Damage: ${this.damage}
 Stamina usage: ${this.stamina}
-Type: Normal
+Type: ${this.type}
 Equip slot: ${this.hand}`;
     }
 
-    attack(source: Entity, target: Entity, targetAction: TurnAction, game: Game): void {
+    attack(source: Entity, target: Entity, targetAction: TurnAction, game: Game, incomingActions: TurnAction[]): void {
         switch (targetAction) {
             case TurnAction.NORMAL_ATTACK:
                 this.doDirectAttack(this.damage, this.stamina, source, target, game);
@@ -47,6 +47,9 @@ Equip slot: ${this.hand}`;
                 break;
             case TurnAction.BLOCK:
                 console.log("LMAO rolled");
+                break;
+            case TurnAction.PREPARE:
+                this.doDirectAttack(this.damage, this.stamina, source, target, game);
                 break;
             default:
                 assertUnreachable(targetAction);

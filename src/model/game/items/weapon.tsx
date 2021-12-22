@@ -5,11 +5,14 @@ import Player from "../player";
 import Item from "./item"
 
 enum WeaponType {
-    LIGHT, NORMAL, HEAVY, OTHER
+    LIGHT = "Light", 
+    NORMAL = "Normal",
+    HEAVY = "Heavy",
+    OTHER = "Other"
 }
 
 enum TurnAction {
-    NORMAL_ATTACK, BLOCK, LIGHT_ATTACK, PARRY, HEAVY_ATTACK, BASH, REST, NONE
+    NORMAL_ATTACK, BLOCK, LIGHT_ATTACK, PARRY, HEAVY_ATTACK, BASH, REST, PREPARE, NONE
 }
 
 enum EquipHand {
@@ -31,8 +34,10 @@ abstract class Weapon extends Item {
     }
 
     abstract options(player: Player): CombatOption[];
-
     abstract details(): string;
+    finishTurn(owner: Entity, game: Game): void {
+        // no-op by default
+    }
 
     protected doDirectAttack(damage: number, stamina: number, source: Entity, target: Entity, game: Game) {
         if (source.setStamina(source.getStamina() - stamina)) {
