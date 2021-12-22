@@ -86,6 +86,10 @@ class TakeableItems {
         return this.items
             .filter(item => item.state !== ItemState.TAKEN);
     }
+
+    itemPresent(item: Item): boolean {
+        return this.presentItems().map(item => item.item).includes(item);
+    }
 };
 
 export default TakeableItems;

@@ -7,6 +7,7 @@ import Option from "../../userinput/option";
 import BasicEnemy from "../enemies/basicEnemy";
 import Game from "../game";
 import BasicNormalWeapon from "../items/basicNormalWeapon";
+import { Weapon } from "../items/weapon";
 import Room from "../room";
 import TakeableItems from "./takeableItems";
 
@@ -68,8 +69,10 @@ class EnemyRoom extends Room {
     private getLookDescription(): string {
         if (this.enemy.isAlive()) {
             return "There's a skeleton sitting in the corner. Wonder what it's up to!\n" + this.connections.getDescription();
-        } else {
+        } else if (this.items.itemPresent(this.enemy.mainHand as Weapon)) {
             return "The skeleton's bones lie in a pile in the corner, with its rusty sword nearby.\n" + this.connections.getDescription()
+        } else {
+            return "The skeleton's bones lie in a pile in the corner.\n" + this.connections.getDescription()
         }
     }
 }
