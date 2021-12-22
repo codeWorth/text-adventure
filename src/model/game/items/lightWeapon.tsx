@@ -37,7 +37,8 @@ abstract class LightWeapon extends Weapon {
                         passFirst(player, this.parry.bind(this))
                     )
                 )
-                : undefined
+                : undefined,
+            this.flurryAttack(player)
         );
     }
 
@@ -55,6 +56,26 @@ abstract class LightWeapon extends Weapon {
         } else {
             game.log(`${source.name} was too tired to parry.`);
         }
+    }
+
+    protected flurryAttack(player: Player): CombatOption | undefined {
+        if (player.mainHand !== this || !(player.offHand instanceof LightWeapon)) {
+            return;
+        }
+
+        const offWeapon = player.offHand as LightWeapon;
+        return CombatOption.forName(
+            "flurry",
+            new TargetedCombatAction(
+                player,
+                TurnAction.LIGHT_ATTACK,
+                this.attackStamina + offWeapon.attackStamina,
+                (target, targetAction, game, incomingActions) => {
+                    this.attack(player, target, targetAction, game, incomingActions);
+                    offWeapon.attack(player, target, targetAction, game, incomingActions);
+                }
+            )
+        )
     }
 }
 
