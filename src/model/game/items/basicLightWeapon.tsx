@@ -16,7 +16,6 @@ class BasicLightWeapon extends LightWeapon {
     }
 
     attack(source: Entity, target: Entity, targetAction: TurnAction, game: Game, incomingActions: TurnAction[]): void {
-        source.decreaseStamina(this.attackStamina);
         switch (targetAction) {
             case TurnAction.NORMAL_ATTACK:
                 this.doDirectAttack(this.damage, this.attackStamina, source, target, game);
@@ -56,10 +55,10 @@ class BasicLightWeapon extends LightWeapon {
             default:
                 assertUnreachable(targetAction);
         }
+        source.decreaseStamina(this.attackStamina);
     }
 
     parry(source: Entity, target: Entity, targetAction: TurnAction, game: Game, incomingActions: TurnAction[]): void {
-        source.decreaseStamina(this.parryStamina);
         switch (targetAction) {
             case TurnAction.NORMAL_ATTACK:
                 this.doParry(source, target, game);
@@ -96,6 +95,7 @@ class BasicLightWeapon extends LightWeapon {
             default:
                 assertUnreachable(targetAction);
         }
+        source.decreaseStamina(this.parryStamina);
     }
 
     details(): string {

@@ -14,7 +14,6 @@ class BasicShield extends Shield {
     }
 
     block(source: Entity, target: Entity, targetAction: TurnAction, game: Game, incomingActions: TurnAction[]): void {
-        source.decreaseStamina(this.stamina);
         switch (targetAction) {
             case TurnAction.NORMAL_ATTACK:
                 if (Math.random() < this.blockChance) {
@@ -51,6 +50,7 @@ class BasicShield extends Shield {
             default:
                 assertUnreachable(targetAction);
         }
+        source.decreaseStamina(this.stamina);
     }
 
     details(): string {

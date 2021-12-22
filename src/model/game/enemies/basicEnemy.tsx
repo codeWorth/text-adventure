@@ -11,7 +11,7 @@ class BasicEnemy extends Enemy {
     }
 
     protected decideAction(game: Game): TurnAction {
-        if (this.getStamina() > 0) {
+        if (this.getStamina() >= (this.mainHand as NormalWeapon).stamina) {
             return TurnAction.NORMAL_ATTACK;
         } else {
             return TurnAction.REST;

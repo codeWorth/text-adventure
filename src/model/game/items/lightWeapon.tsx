@@ -7,8 +7,8 @@ import { Weapon, TurnAction, WeaponType, EquipHand } from "./weapon";
 
 abstract class LightWeapon extends Weapon {
 
-    protected readonly attackStamina: number;
-    protected readonly parryStamina: number;
+    public readonly attackStamina: number;
+    public readonly parryStamina: number;
 
     constructor(name: string, pickupNames: string[], attackStamina: number, parryStamina: number, hand: EquipHand) {
         super(name, pickupNames, WeaponType.LIGHT, hand);

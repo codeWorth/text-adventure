@@ -7,7 +7,7 @@ import { EquipHand, TurnAction, Weapon, WeaponType } from "./weapon";
 
 abstract class NormalWeapon extends Weapon {
 
-    protected readonly stamina: number;
+    public readonly stamina: number;
 
     constructor(name: string, pickupNames: string[], stamina: number, hand: EquipHand) {
         super(name, pickupNames, WeaponType.NORMAL, hand);
