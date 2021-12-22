@@ -264,7 +264,7 @@ class Player extends Entity {
     }
 
     printBattleInfo(game: Game) {
-        game.log(`Name: ${this.name}
+        game.log(`${this.name}
 Health: ${this.getHealthBar()}
 Stamina: ${this.getStaminaBar()}`);
     }
@@ -283,7 +283,7 @@ Off Hand: ${this.offHand?.name || "None"}`;
         }
 
         game.log(
-`Name: ${this.name}
+`${this.name}
 ${weaponStr}
 
 Items: 

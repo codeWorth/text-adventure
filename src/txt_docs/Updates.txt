@@ -14,7 +14,7 @@ General Tasks:
     -perhaps it shouldn't waste the turn, and instead warn the player that they don't have enough stamina
 
 In battle screen
--get rid of the "Name:" text
+-get rid of the "Name:" text (done)
 -Move the enemy text above the player text
 
 

@@ -122,7 +122,7 @@ class Entity {
 
     printBattleInfo(game: Game) {
         if (!this.isAlive()) return;
-        game.log(`Name: ${this.name}
+        game.log(`${this.name}
 Health: ${this.getHealthBar()}
 Stamina: ${this.getStaminaBar()}`);
     }
