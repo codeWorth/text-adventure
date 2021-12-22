@@ -11,7 +11,11 @@ abstract class Enemy extends Entity {
 
     turnAction(game: Game): TurnAction {
         if (this.cachedTurnAction === undefined) {
-            this.cachedTurnAction = this.decideAction(game);
+            if (this.stunned) {
+                this.cachedTurnAction = TurnAction.NONE;
+            } else {
+                this.cachedTurnAction = this.decideAction(game);
+            }
         }
         return this.cachedTurnAction;
     }

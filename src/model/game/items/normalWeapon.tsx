@@ -7,8 +7,11 @@ import { EquipHand, TurnAction, Weapon, WeaponType } from "./weapon";
 
 abstract class NormalWeapon extends Weapon {
 
+    protected readonly stamina: number;
+
     constructor(name: string, pickupNames: string[], stamina: number, hand: EquipHand) {
-        super(name, pickupNames, stamina, WeaponType.NORMAL, hand);
+        super(name, pickupNames, WeaponType.NORMAL, hand);
+        this.stamina = stamina;
     }
 
     options(player: Player): CombatOption[] {

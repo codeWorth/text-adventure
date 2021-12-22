@@ -8,10 +8,12 @@ import { EquipHand, TurnAction, Weapon, WeaponType } from "./weapon";
 abstract class HeavyWeapon extends Weapon {
 
     private prepared: boolean;
+    protected readonly stamina: number;
 
     constructor(name: string, pickupNames: string[], stamina: number, hand: EquipHand) {
-        super(name, pickupNames, stamina, WeaponType.HEAVY, hand);
+        super(name, pickupNames, WeaponType.HEAVY, hand);
         this.prepared = false;
+        this.stamina = stamina;
     }
 
     options(player: Player): CombatOption[] {

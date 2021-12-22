@@ -56,6 +56,19 @@ class Player extends Entity {
     }
 
     combatOptions(): Option[] {
+        if (this.stunned) {
+            return [
+                CombatOption.forName(
+                    "wait",
+                    new UntargetedCombatAction(
+                        TurnAction.NONE,
+                        0,
+                        () => undefined
+                    )
+                )
+            ];
+        }
+
         const mainOptions: CombatOption[] = this.mainHand?.options(this) || [];
         const offOptions: CombatOption[] = this.offHand?.options(this) || [];
 
@@ -86,6 +99,14 @@ class Player extends Entity {
             CombatOption.forName(
                 "rest",
                 new UntargetedCombatAction(TurnAction.REST, 0, game => this.rest(game))
+            ),
+            CombatOption.forName(
+                "wait",
+                new UntargetedCombatAction(
+                    TurnAction.NONE,
+                    0,
+                    () => undefined
+                )
             )
         );
     }

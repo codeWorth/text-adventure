@@ -51,13 +51,11 @@ enum EquipHand {
 
 abstract class Weapon extends Item {
 
-    public readonly stamina: number;
     public readonly type: WeaponType;
     public readonly hand: EquipHand;
 
-    constructor(name: string, pickupNames: string[], stamina: number, type: WeaponType, hand: EquipHand) {
+    constructor(name: string, pickupNames: string[], type: WeaponType, hand: EquipHand) {
         super(name, pickupNames);
-        this.stamina = stamina;
         this.type = type;
         this.hand = hand;
     }

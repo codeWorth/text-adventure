@@ -12,7 +12,7 @@ class Entity {
     private stamina: number;
     private maxHealth: number;
     private maxStamina: number;
-    public stunned: boolean;
+    private stunnedTurns: number;
 
     public mainHand?: Weapon;
     public offHand?: Weapon;
@@ -26,8 +26,12 @@ class Entity {
         this.health = maxHealth;
         this.maxStamina = maxStamina;
         this.stamina = maxStamina;
-        this.stunned = false;
         this.deathListeners = [];
+        this.stunnedTurns = 0;
+    }
+
+    get stunned() {
+        return this.stunnedTurns > 0;
     }
 
     addDeathListener(listener: () => void) {
@@ -104,6 +108,10 @@ class Entity {
         return this.blocking?.attacksFrom === attacksFrom;
     }
 
+    stun() {
+        this.stunnedTurns = 2;
+    }
+
     calculateOutgoingDamage(baseDamage: number, to: Entity): number {
         return baseDamage;
     }
@@ -121,6 +129,10 @@ Stamina: ${this.getStaminaBar()}`);
 
     finishTurn(game: Game) {
         this.blocking = undefined;
+        if (this.stunned) {
+            this.stunnedTurns--;
+            if (!this.stunned) game.log(`${this.name} has recovered from being stunned.`);
+        }
     }
 }
 

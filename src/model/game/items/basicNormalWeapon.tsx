@@ -46,7 +46,7 @@ Equip slot: ${this.hand}`;
                 }
                 break;
             case TurnAction.PARRY:
-                console.log("LMAO rolled");
+                this.doDirectAttack(0, this.stamina, source, target, game);
                 break;
             case TurnAction.BLOCK:
                 if (target.isBlocking(source)) {

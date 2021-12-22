@@ -7,8 +7,13 @@ import { Weapon, TurnAction, WeaponType, EquipHand } from "./weapon";
 
 abstract class LightWeapon extends Weapon {
 
-    constructor(name: string, pickupNames: string[], stamina: number, hand: EquipHand) {
-        super(name, pickupNames, stamina, WeaponType.LIGHT, hand);
+    protected readonly attackStamina: number;
+    protected readonly parryStamina: number;
+
+    constructor(name: string, pickupNames: string[], attackStamina: number, parryStamina: number, hand: EquipHand) {
+        super(name, pickupNames, WeaponType.LIGHT, hand);
+        this.attackStamina = attackStamina;
+        this.parryStamina = parryStamina;
     }
 
     options(player: Player): CombatOption[] {
@@ -18,7 +23,7 @@ abstract class LightWeapon extends Weapon {
                 new TargetedCombatAction(
                     player,
                     TurnAction.LIGHT_ATTACK,
-                    this.stamina,
+                    this.attackStamina,
                     passFirst(player, this.attack.bind(this))
                 )
             ),
@@ -28,7 +33,7 @@ abstract class LightWeapon extends Weapon {
                     new TargetedCombatAction(
                         player,
                         TurnAction.PARRY,
-                        this.stamina,
+                        this.parryStamina,
                         passFirst(player, this.parry.bind(this))
                     )
                 )
@@ -40,7 +45,16 @@ abstract class LightWeapon extends Weapon {
     abstract parry(source: Entity, target: Entity, targetAction: TurnAction, game: Game, incomingActions: TurnAction[]): void;
 
     private canParry(player: Player) {
-        return player.mainHand?.type === WeaponType.LIGHT && player.offHand?.type == WeaponType.LIGHT && player.mainHand === this;
+        return player.mainHand?.type === WeaponType.LIGHT && player.offHand?.type === WeaponType.LIGHT && player.mainHand === this;
+    }
+
+    protected doParry(source: Entity, target: Entity, game: Game) {
+        if (source.getStamina() > this.parryStamina) {
+            target.stun();
+            game.log(`${source.name} parried the attack from ${target.name}. ${target.name} has been stunned!`);
+        } else {
+            game.log(`${source.name} was too tired to parry.`);
+        }
     }
 }
 
