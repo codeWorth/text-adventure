@@ -156,7 +156,7 @@ class Player extends Entity {
                     ));
                 }
 
-                if (weapon.hand === EquipHand.ANY && (!this.mainHand || this.usingFists())) {
+                if (weapon.hand === EquipHand.ANY && (!this.mainHand || this.mainHand?.hand === EquipHand.BOTH)) {
                     applyAction = new PureAction(game => this.equipToMainHand(weapon, game));
                 } else if (weapon.hand === EquipHand.ANY && !this.offHand) {
                     applyAction = new PureAction(game => this.equipToOffHand(weapon, game));

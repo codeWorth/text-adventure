@@ -12,7 +12,7 @@ abstract class HeavyWeapon extends Weapon {
     public readonly bashStamina: number;
 
     constructor(name: string, pickupNames: string[], attackStamina: number, bashStamina: number) {
-        super(name, pickupNames, WeaponType.HEAVY, EquipHand.MAIN);
+        super(name, pickupNames, WeaponType.HEAVY, EquipHand.BOTH);
         this.attackStamina = attackStamina;
         this.bashStamina = bashStamina;
         this.preparedTurns = 0;
