@@ -98,6 +98,9 @@ class Game {
                 i++;
             }
         }
+        if (!playerExecuted) {
+            playerAction(enemiesActions);
+        }
 
         this.finishTurn();
     }
