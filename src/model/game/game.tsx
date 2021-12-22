@@ -118,21 +118,16 @@ class Game {
 
         this.player.printBattleInfo(this);
         this.player.getCombatEnemies().forEach(enemy => enemy.printBattleInfo(this));
+
+        if (!this.player.inCombat) {
+            this.player.replenishStamina();
+        }
     }
 
     enterCombat(...enemies: Enemy[]) {
         this.player.printBattleInfo(this);
-        enemies.forEach(enemy => {
-            enemy.printBattleInfo(this);
-            enemy.addDeathListener(() => this.enemyDied(enemy));
-        });
+        enemies.forEach(enemy => enemy.printBattleInfo(this));
         this.player.enterCombat(...enemies);
-    }
-
-    private enemyDied(enemy: Enemy) {
-        if (!this.player.inCombat) {
-            this.player.replenishStamina();
-        }
     }
 
     unlockAllRooms() {
