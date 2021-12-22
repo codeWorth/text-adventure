@@ -1,7 +1,7 @@
 Updates for 12/21/2021
 Bugs:
--the large iron key does not disappear from inventory after opening the locked door (done)
--text does not update when taking the rusty sword from the skele
+-the large iron key does not disappear from inventory after opening the locked door (fixed)
+-text does not update when taking the rusty sword from the skele (fixed)
 
 General Tasks:
 -center the entire terminal window (not sure if this is easy to do or hard)
