@@ -10,7 +10,7 @@ class BasicEnemy extends Enemy {
         this.mainHand = weapon;
     }
 
-    decideAction(game: Game): TurnAction {
+    protected decideAction(game: Game): TurnAction {
         if (this.getStamina() > 0) {
             return TurnAction.NORMAL_ATTACK;
         } else {
@@ -20,12 +20,12 @@ class BasicEnemy extends Enemy {
 
     executeTurn(playerAction: TurnAction, game: Game): void {
         const weapon = this.mainHand as NormalWeapon;
-        const action = this.decideAction(game);
+        const action = this.turnAction(game);
 
         if (action === TurnAction.REST) {
             this.rest(game);
         } else if (action === TurnAction.NORMAL_ATTACK) {
-            weapon.attack(this, game.player, playerAction, game);
+            weapon.attack(this, game.player, playerAction, game, [playerAction]);
         }
     }
 }

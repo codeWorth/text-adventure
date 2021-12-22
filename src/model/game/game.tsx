@@ -6,7 +6,7 @@ import { Rooms, makeRooms } from "./rooms";
 import { parseInput, ParseResponseType } from "../userinput/input";
 import ActionBuilder from "../userinput/actions/actionBuilder";
 import { CombinedContextBuilder } from "../userinput/actions/combinedBuilders";
-import { TurnAction } from "./items/weapon";
+import { actionOrder, TurnAction } from "./items/weapon";
 import Enemy from "./enemies/enemy";
 import EmptyAction from "../userinput/actions/emptyAction";
 
@@ -75,20 +75,47 @@ class Game {
         this.enter(connection.getDestination(this.currentRoom));
     }
 
-    // enemy turn must be executed before player turn, or else enemy action might change in an unexpected way
-    enemyTurn(playerAction: TurnAction, target?: Enemy) {
-        if (target && !this.player.getCombatEnemies().includes(target)) return;
+    executeTurn(playerActionType: TurnAction, playerAction: (incomingActions: TurnAction[]) => void, playerTarget?: Enemy) {
+        // first enemy has lowest action order
+        const enemies = this.player.getCombatEnemies()
+            .sort((a, b) => actionOrder(a.turnAction(this)) - actionOrder(b.turnAction(this)));
+        let playerExecuted = false;
+        const playerActionOrder = actionOrder(playerActionType);
+        const enemiesActions = enemies.map(enemy => enemy.turnAction(this));
 
-        this.player.getCombatEnemies().forEach(enemy => {
-            if (enemy === target) {
-                enemy.executeTurn(playerAction, this);
+        let i = 0;
+        while (i < enemies.length) {
+            const enemy = enemies[i];
+            const currentActionOrder = actionOrder(enemy.turnAction(this));
+            if (!playerExecuted && playerActionOrder <= currentActionOrder) {
+                playerExecuted = true;
+                playerAction(enemiesActions);
             } else {
-                enemy.executeTurn(TurnAction.NONE, this);
+                enemy.executeTurn(
+                    enemy === playerTarget ? playerActionType : TurnAction.NONE, 
+                    this
+                );
+                i++;
             }
-        });
+        }
+        if (!playerExecuted) {
+            playerAction(enemiesActions);
+        }
+
+        this.finishTurn();
     }
 
-    finishTurn() {
+    private finishTurn() {
+        this.player.mainHand?.finishTurn(this.player, this);
+        this.player.offHand?.finishTurn(this.player, this);
+        this.player.finishTurn(this);
+
+        this.player.getCombatEnemies().forEach(enemy => {
+            enemy.mainHand?.finishTurn(enemy, this);
+            enemy.offHand?.finishTurn(enemy, this);
+            enemy.finishTurn(this);
+        });
+
         this.player.printBattleInfo(this);
         this.player.getCombatEnemies().forEach(enemy => enemy.printBattleInfo(this));
     }
@@ -104,7 +131,7 @@ class Game {
 
     private enemyDied(enemy: Enemy) {
         if (!this.player.inCombat) {
-            this.player.setStamina(this.player.getMaxStamina());
+            this.player.replenishStamina();
         }
     }
 

@@ -3,12 +3,27 @@ import Game from "../game";
 import { TurnAction } from "../items/weapon";
 
 abstract class Enemy extends Entity {
-    abstract decideAction(game: Game): TurnAction;
+
+    private cachedTurnAction?: TurnAction;
+
+    protected abstract decideAction(game: Game): TurnAction;
     abstract executeTurn(playerAction: TurnAction, game: Game): void;
+
+    turnAction(game: Game): TurnAction {
+        if (this.cachedTurnAction === undefined) {
+            this.cachedTurnAction = this.decideAction(game);
+        }
+        return this.cachedTurnAction;
+    }
 
     rest(game: Game) {
         game.log(`${this.name} took a moment to rest.`);
         this.increaseStamina(2);
+    }
+
+    finishTurn(game: Game): void {
+        super.finishTurn(game);
+        this.cachedTurnAction = undefined;
     }
 }
 

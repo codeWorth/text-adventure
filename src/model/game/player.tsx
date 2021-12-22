@@ -63,7 +63,7 @@ class Player extends Entity {
         const offNames = new Set(offOptions.map(option => option.name));
 
         const onlyMainOptions: CombatOption[] = mainOptions.filter(option => !offNames.has(option.name));
-        const onlyOffOptions: CombatOption[] = mainOptions.filter(option => !mainNames.has(option.name));
+        const onlyOffOptions: CombatOption[] = offOptions.filter(option => !mainNames.has(option.name));
 
         return nonNull(
             ...onlyMainOptions,
@@ -85,7 +85,7 @@ class Player extends Entity {
             ),
             CombatOption.forName(
                 "rest",
-                new UntargetedCombatAction(TurnAction.REST, game => this.rest(game))
+                new UntargetedCombatAction(TurnAction.REST, 0, game => this.rest(game))
             )
         );
     }
@@ -104,20 +104,30 @@ class Player extends Entity {
         return [
             ...this.getWeaponsInInventory().flatMap(weapon => {
                 let applyAction: string | PureAction = "You must specify which hand to equip to.";
-                const options = [];
+                let options: Option[] = [];
 
                 if (weapon.hand === EquipHand.BOTH) {
                     applyAction = new PureAction(game => this.equipTwoHanded(weapon, game));
-                }
-
-                if (weapon.hand === EquipHand.MAIN || weapon.hand === EquipHand.ANY) {
+                } else if (weapon.hand === EquipHand.MAIN) {
+                    applyAction = new PureAction(game => this.equipToMainHand(weapon, game));
                     options.push(...Option.forNames(
                         new PureAction(game => this.equipToMainHand(weapon, game)),
                         " to main hand", 
                         " main hand",
                     ));
-                }
-                if (weapon.hand === EquipHand.OFF || weapon.hand === EquipHand.ANY) {
+                } else if (weapon.hand === EquipHand.OFF) {
+                    applyAction = new PureAction(game => this.equipToOffHand(weapon, game));
+                    options.push(...Option.forNames(
+                        new PureAction(game => this.equipToOffHand(weapon, game)),
+                        " to off hand", 
+                        " off hand",
+                    ));
+                } else if (weapon.hand === EquipHand.ANY) {
+                    options.push(...Option.forNames(
+                        new PureAction(game => this.equipToMainHand(weapon, game)),
+                        " to main hand", 
+                        " main hand",
+                    ));
                     options.push(...Option.forNames(
                         new PureAction(game => this.equipToOffHand(weapon, game)),
                         " to off hand", 

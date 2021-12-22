@@ -1,10 +1,15 @@
+import { passFirst } from "../../../util";
 import { CombatOption, TargetedCombatAction } from "../../userinput/actions/combatActions";
 import Entity from "../entity";
 import Game from "../game";
 import Player from "../player";
-import { TurnAction, Weapon } from "./weapon";
+import { EquipHand, TurnAction, Weapon, WeaponType } from "./weapon";
 
 abstract class NormalWeapon extends Weapon {
+
+    constructor(name: string, pickupNames: string[], stamina: number, hand: EquipHand) {
+        super(name, pickupNames, stamina, WeaponType.NORMAL, hand);
+    }
 
     options(player: Player): CombatOption[] {
         return [CombatOption.forName(
@@ -12,12 +17,13 @@ abstract class NormalWeapon extends Weapon {
             new TargetedCombatAction(
                 player,
                 TurnAction.NORMAL_ATTACK,
-                (target, targetAction, game) => this.attack(game.player, target, targetAction, game)
+                this.stamina,
+                passFirst(player, this.attack.bind(this))
             )
         )];
     }
 
-    abstract attack(source: Entity, target: Entity, targetAction: TurnAction, game: Game): void;
+    abstract attack(source: Entity, target: Entity, targetAction: TurnAction, game: Game, incomingActions: TurnAction[]): void;
 }
 
 export default NormalWeapon;

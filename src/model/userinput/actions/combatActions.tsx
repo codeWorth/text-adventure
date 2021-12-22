@@ -7,22 +7,29 @@ import ActionBuilder from "./actionBuilder";
 import PureAction from "./pureAction";
 import TerminalAction from "./terminalAction";
 
+export type UntargetedPlayerAction = (game: Game, incomingActions: TurnAction[]) => void;
+export type TargetedPlayerAction = (target: Enemy, targetAction: TurnAction, game: Game, incomingActions: TurnAction[]) => void;
+
 export type CombatAction = UntargetedCombatAction | TargetedCombatAction;
 
 export class UntargetedCombatAction extends TerminalAction {
     private readonly playerActionType: TurnAction;
-    private readonly playerAction: (game: Game) => void;
+    private readonly stamina: number;
+    private readonly playerAction: UntargetedPlayerAction;
 
-    constructor(playerActionType: TurnAction, playerAction: (game: Game) => void) {
+    constructor(playerActionType: TurnAction, stamina: number, playerAction: UntargetedPlayerAction) {
         super();
         this.playerActionType = playerActionType;
+        this.stamina = stamina;
         this.playerAction = playerAction;
     }
 
     apply(game: Game): void {
-        game.enemyTurn(this.playerActionType);
-        this.playerAction(game);
-        game.finishTurn();
+        if (game.player.getStamina() >= this.stamina) {
+            game.executeTurn(this.playerActionType, actions => this.playerAction(game, actions));
+        } else {
+            game.error(`You need at least ${this.stamina} stamina to do that.`);
+        }
     }
 }
 
@@ -30,15 +37,13 @@ export class TargetedCombatAction implements ActionBuilder {
 
     private readonly player: Player;
     private readonly playerActionType: TurnAction;
-    private readonly playerAction: (target: Enemy, targetAction: TurnAction, game: Game) => void;
+    private readonly stamina: number;
+    private readonly playerAction: TargetedPlayerAction;
 
-    constructor(
-        player: Player, 
-        playerActionType: TurnAction, 
-        playerAction: (target: Enemy, targetAction: TurnAction, game: Game) => void
-    ) {
+    constructor(player: Player, playerActionType: TurnAction, stamina: number, playerAction: TargetedPlayerAction) {
         this.player = player;
         this.playerActionType = playerActionType;
+        this.stamina = stamina;
         this.playerAction = playerAction;
     }
 
@@ -67,10 +72,15 @@ export class TargetedCombatAction implements ActionBuilder {
     }
 
     private doAction(target: Enemy, game: Game) {
-        const targetAction = target.decideAction(game);
-        game.enemyTurn(this.playerActionType, target);
-        this.playerAction(target, targetAction, game);
-        game.finishTurn();
+        if (game.player.getStamina() >= this.stamina) {
+            game.executeTurn(
+                this.playerActionType, 
+                actions => this.playerAction(target, target.turnAction(game), game, actions),
+                target
+            );
+        } else {
+            game.error(`You need at least ${this.stamina} stamina to do that.`);
+        }
     }
 }
 

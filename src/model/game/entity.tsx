@@ -1,6 +1,10 @@
 import Game from "./game";
 import { Weapon, WeaponType } from "./items/weapon";
 
+type Blocking = {
+    attacksFrom: Entity;
+}
+
 class Entity {
 
     public readonly name: string;
@@ -14,6 +18,7 @@ class Entity {
     public offHand?: Weapon;
 
     private deathListeners: (() => void)[];
+    private blocking?: Blocking;
 
     constructor(name: string, maxHealth: number, maxStamina: number) {
         this.name = name;
@@ -61,19 +66,16 @@ class Entity {
         }
     }
 
-    setStamina(stamina: number): boolean {
-        if (stamina < 0) {
-            return false;
-        } else if (stamina > this.maxStamina) {
-            return false;
-        } else {
-            this.stamina = stamina;
-            return true;
-        }
+    decreaseStamina(amount: number) {
+        this.stamina = Math.max(0, this.stamina - amount);
     }
 
     increaseStamina(amount: number) {
         this.stamina = Math.min(this.stamina + amount, this.maxStamina);
+    }
+
+    replenishStamina() {
+        this.stamina = this.maxStamina;
     }
 
     increaseMaxHealth(amt: number){
@@ -94,10 +96,31 @@ class Entity {
         return this.getHealth() > 0;
     }
 
+    block(attacksFrom: Entity) {
+        this.blocking = {attacksFrom: attacksFrom};
+    }
+
+    isBlocking(attacksFrom: Entity) {
+        return this.blocking?.attacksFrom === attacksFrom;
+    }
+
+    calculateOutgoingDamage(baseDamage: number, to: Entity): number {
+        return baseDamage;
+    }
+
+    calculateIncomingDamage(baseDamage: number, from: Entity, weapon: Weapon): number {
+        return baseDamage;
+    }
+
     printBattleInfo(game: Game) {
         if (!this.isAlive()) return;
         game.log(`Name: ${this.name}
-Health: ${this.getHealthBar()}`);
+Health: ${this.getHealthBar()}
+Stamina: ${this.getStaminaBar()}`);
+    }
+
+    finishTurn(game: Game) {
+        this.blocking = undefined;
     }
 }
 
