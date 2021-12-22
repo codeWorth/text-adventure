@@ -1,4 +1,4 @@
-import { any, assertUnreachable, none, nonNull, passFirst } from "../../../util";
+import { assertUnreachable, none, nonNull, passFirst } from "../../../util";
 import { CombatOption, TargetedCombatAction, UntargetedCombatAction } from "../../userinput/actions/combatActions";
 import Entity from "../entity";
 import Game from "../game";
@@ -7,13 +7,19 @@ import { EquipHand, TurnAction, Weapon, WeaponType } from "./weapon";
 
 abstract class HeavyWeapon extends Weapon {
 
-    private prepared: boolean;
-    public readonly stamina: number;
+    private preparedTurns: number;
+    public readonly attackStamina: number;
+    public readonly bashStamina: number;
 
-    constructor(name: string, pickupNames: string[], stamina: number, hand: EquipHand) {
-        super(name, pickupNames, WeaponType.HEAVY, hand);
-        this.prepared = false;
-        this.stamina = stamina;
+    constructor(name: string, pickupNames: string[], attackStamina: number, bashStamina: number) {
+        super(name, pickupNames, WeaponType.HEAVY, EquipHand.MAIN);
+        this.attackStamina = attackStamina;
+        this.bashStamina = bashStamina;
+        this.preparedTurns = 0;
+    }
+
+    get prepared() {
+        return this.preparedTurns > 0;
     }
 
     options(player: Player): CombatOption[] {
@@ -22,21 +28,30 @@ abstract class HeavyWeapon extends Weapon {
                 "prepare",
                 new UntargetedCombatAction(
                     TurnAction.PREPARE,
-                    this.stamina,
+                    0,
                     passFirst(player, this.prepare.bind(this))
                 )
             ),
             this.prepared
                 ? CombatOption.forName(
-                    "attaack",
+                    "attack",
                     new TargetedCombatAction(
                         player,
                         TurnAction.NORMAL_ATTACK,
-                        this.stamina,
+                        this.attackStamina,
                         passFirst(player, this.attack.bind(this))
                     )
                 )
-                : undefined
+                : undefined,
+            CombatOption.forName(
+                "bash",
+                new TargetedCombatAction(
+                    player,
+                    TurnAction.BASH,
+                    this.bashStamina,
+                    passFirst(player, this.bash.bind(this))
+                )
+            )
         );
     }
 
@@ -63,20 +78,33 @@ abstract class HeavyWeapon extends Weapon {
                     return false;
                 default:
                     assertUnreachable(action);
+                    return false;
             }
         });
 
         if (none(interupted)) {
-            this.prepared = true;
+            this.preparedTurns = 2;
             game.log(`${source.name} prepares to strike.`);
         }
     }
 
     finishTurn(owner: Entity, game: Game): void {
-        this.prepared = false;
+        if (this.prepared) {
+            this.preparedTurns--;
+        }
+    }
+
+    doBlock(source: Entity, target: Entity, game: Game) {
+        if (source.getStamina() > this.bashStamina) {
+            source.block(target);
+            game.log(`${source.name} blocked the attack from ${target.name}!`);
+        } else {
+            game.log(`${source.name} was too tired to block.`);
+        }
     }
 
     abstract attack(source: Entity, target: Entity, targetAction: TurnAction, game: Game, incomingActions: TurnAction[]): void;
+    abstract bash(source: Entity, target: Entity, targetAction: TurnAction, game: Game, incomingActions: TurnAction[]): void;
 
 }
 

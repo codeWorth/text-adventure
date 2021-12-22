@@ -2,6 +2,7 @@ import LookBuilder from "../../userinput/actions/lookBuilder";
 import OptionsBuilder from "../../userinput/actions/optionsBuilder";
 import Option from "../../userinput/option";
 import Game from "../game";
+import BasicHeavyWeapon from "../items/basicHeavyWeapon";
 import BasicLightWeapon from "../items/basicLightWeapon";
 import BasicNormalWeapon from "../items/basicNormalWeapon";
 import BasicShield from "../items/basicShield";
@@ -24,6 +25,7 @@ class StartRoom extends Room {
         this.takeableItems.addKnownItem(new BasicShield("Shield", [], 0.5, 2), "Ohh a shield yooo");
         this.takeableItems.addKnownItem(new BasicLightWeapon("Red dagger", [], 1, 1, 2), "Dagger :)");
         this.takeableItems.addKnownItem(new BasicLightWeapon("Blue dagger", [], 1, 1, 2), "Dagger :))");
+        this.takeableItems.addKnownItem(new BasicHeavyWeapon("Axe", [], 4, 2, 1, 2, 0.5), "Big ol' axe");
     }
 
     getOptions(game: Game): Option[] {

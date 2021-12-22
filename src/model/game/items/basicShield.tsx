@@ -35,7 +35,7 @@ class BasicShield extends Shield {
                 game.log(`${source.name} braced against an attack from ${target.name}, but none came.`);
                 break;
             case TurnAction.BASH:
-                source.block(target);
+                this.doBlock(source, target, game);
                 game.log(`${source.name} blocked the attack from ${target.name}!`);
                 break;
             case TurnAction.PARRY:
