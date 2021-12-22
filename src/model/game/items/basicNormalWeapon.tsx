@@ -21,7 +21,6 @@ Equip slot: ${this.hand}`;
     }
 
     attack(source: Entity, target: Entity, targetAction: TurnAction, game: Game, incomingActions: TurnAction[]): void {
-        source.decreaseStamina(this.stamina);
         switch (targetAction) {
             case TurnAction.NORMAL_ATTACK:
                 this.doDirectAttack(this.damage, this.stamina, source, target, game);
@@ -61,6 +60,7 @@ Equip slot: ${this.hand}`;
             default:
                 assertUnreachable(targetAction);
         }
+        source.decreaseStamina(this.stamina);
     }
 }
 
