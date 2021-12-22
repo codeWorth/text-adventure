@@ -65,6 +65,7 @@ class Game {
             if (this.player.hasKey(key)) {
                 this.writeLog(key.openMessage);
                 connection.unlock();
+                this.player.removeItem(key);
 
             } else {
                 this.writeLog(key.lockedMessage);

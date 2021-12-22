@@ -259,7 +259,7 @@ class Player extends Entity {
         this.inventory.push(item);
     }
 
-    private removeItem(item: Item) {
+    removeItem(item: Item) {
         this.inventory = this.inventory.filter(_item => _item !== item);
     }
 
