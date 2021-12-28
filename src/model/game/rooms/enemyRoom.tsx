@@ -38,14 +38,13 @@ class EnemyRoom extends Room {
                 HealthPotion.itemBuilder()
                     .name("Small Health Potion")
                     .pickupNames("health potion", "potion")
+                    .lookMessage("A small vial with a cork on top. It looks disgusting, but smells very... nutritious.")
                     .build(),
                 {
                     health: 3
                 }
             )
         );
-        // this.enemy.mainHand!.lookMessage = ;
-        //"A small vial with a cork on top. It looks (and smells) like something a vegan would drink: very healthy, and completely disgusting."
     }
 
     getOptions(game: Game): Option[] {

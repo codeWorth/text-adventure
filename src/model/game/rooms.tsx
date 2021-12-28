@@ -26,6 +26,7 @@ export function makeRooms(): Rooms {
         Key.itemBuilder()
             .name("Large Iron Key")
             .pickupNames("key", "iron key")
+            .lookMessage("Surely this large iron key goes to a large iron door...")
             .build(),
         Key.keyBuilder()
             .lockedMessage("You try to open the door, but it's locked shut. The door is huge and made of iron, so you can't force it open.")
