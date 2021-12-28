@@ -1,5 +1,5 @@
 import Room from "./room";
-import Key from "./items/key";
+import { Key } from "./items/key";
 import StartRoom from "./rooms/startRoom";
 import RiddleRoom from "./rooms/riddleRoom";
 import EnemyRoom from "./rooms/enemyRoom";
@@ -14,15 +14,23 @@ export type Rooms = {
 };
 
 export function makeRooms(): Rooms {
-    const autoKey = new Key({
-        name: "debug-auto-key",
-        pickupNames: [],
-    });
-    const largeIronKey = new Key({
-        name: "Large Iron Key", 
-        pickupNames: ["key", "iron key"],
-        lockedMessage: "You try to open the door, but it's locked shut. The door is huge and made of iron, so you can't force it open."
-    });
+    const autoKey = new Key(
+        Key.itemBuilder()
+            .name("debug-auto-key")
+            .pickupNames()
+            .lookMessage("")
+            .build(),
+        Key.keyBuilder().build()
+    );
+    const largeIronKey = new Key(
+        Key.itemBuilder()
+            .name("Large Iron Key")
+            .pickupNames("key", "iron key")
+            .build(),
+        Key.keyBuilder()
+            .lockedMessage("You try to open the door, but it's locked shut. The door is huge and made of iron, so you can't force it open.")
+            .build()
+    );
 
     const riddleRoom = new RiddleRoom("the Riddle Room", Direction.EAST);
     const chestRoom = new ChestRoom("the Chest Room", largeIronKey);

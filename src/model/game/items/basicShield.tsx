@@ -1,16 +1,21 @@
 import { assertUnreachable, clamp } from "../../../util";
 import Entity from "../entity";
 import Game from "../game";
-import Shield from "./shield";
-import { EquipHand, TurnAction } from "./weapon";
+import { ItemParams } from "./item";
+import { Shield, ShieldParams } from "./shield";
+import { TurnAction, WeaponParams, WeaponType } from "./weapon";
 
-class BasicShield extends Shield {
+export type BasicShieldParams = {
+    blockChance: number;
+};
+
+export class BasicShield extends Shield {
 
     private readonly blockChance: number;
 
-    constructor(name: string, pickupNames: string[], blockChance: number, stamina: number, hand?: EquipHand) {
-        super(name, pickupNames, stamina, hand || EquipHand.OFF);
-        this.blockChance = clamp(blockChance, 0, 1);
+    constructor(itemParams: ItemParams, weaponParams: WeaponParams, shieldParams: ShieldParams, basicShieldParams: BasicShieldParams) {
+        super(itemParams, weaponParams, shieldParams);
+        this.blockChance = clamp(basicShieldParams.blockChance, 0, 1);
     }
 
     block(source: Entity, target: Entity, targetAction: TurnAction, game: Game, incomingActions: TurnAction[]): void {
@@ -59,6 +64,8 @@ Stamina usage: ${this.stamina}
 Type: ${this.type}
 Equip slot: ${this.hand}`;
     }
-}
 
-export default BasicShield;
+    static weaponBuilder() {
+        return super.weaponBuilder().type(WeaponType.NORMAL);
+    }
+}

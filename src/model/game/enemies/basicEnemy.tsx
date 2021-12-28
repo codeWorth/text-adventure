@@ -1,12 +1,13 @@
 import Game from "../game";
-import NormalWeapon from "../items/normalWeapon";
+import { Item } from "../items/item";
+import { NormalWeapon } from "../items/normalWeapon";
 import { TurnAction } from "../items/weapon";
 import Enemy from "./enemy";
 
 class BasicEnemy extends Enemy {
 
-    constructor(name: string, maxHealth: number, maxStamina: number, weapon: NormalWeapon) {
-        super(name, maxHealth, maxStamina);
+    constructor(name: string, maxHealth: number, maxStamina: number, weapon: NormalWeapon, ...drops: Item[]) {
+        super(name, maxHealth, maxStamina, [...drops]);
         this.mainHand = weapon;
     }
 

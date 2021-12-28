@@ -1,4 +1,4 @@
-import Key from "../items/key";
+import { Key } from "../items/key";
 import Room from "../room";
 
 class Connection {

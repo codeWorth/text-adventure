@@ -4,7 +4,7 @@ import { CombinedApplyBuilder } from "../../userinput/actions/combinedBuilders";
 import LogAction from "../../userinput/actions/logAction";
 import PureAction from "../../userinput/actions/pureAction";
 import Option from "../../userinput/option";
-import Item from "../items/item";
+import { Item } from "../items/item";
 import Player from "../player";
 
 enum ItemState {
@@ -14,25 +14,15 @@ enum ItemState {
 type ItemEntry = {
     item: Item,
     state: ItemState,
-    lookMessage: string,
-    pickupMessage?: string
-};
-
-export type ItemInfo = {
-    item: Item,
-    lookMessage: string,
-    pickupMessage?: string
 };
 
 class TakeableItems {
     private readonly items: ItemEntry[];
 
-    constructor(...items: ItemInfo[]) {
+    constructor(...items: Item[]) {
         this.items = items.map(item => ({
-            item: item.item,
-            state: ItemState.UNKNOWN,
-            lookMessage: item.lookMessage,
-            pickupMessage: item.pickupMessage 
+            item: item,
+            state: ItemState.UNKNOWN
         }));
     }
 
@@ -41,12 +31,10 @@ class TakeableItems {
             .forEach(item => item.state = ItemState.KNOWN);
     }
 
-    addKnownItem(item: Item, lookMessage: string, pickupMessage?: string) {
+    addKnownItem(item: Item) {
         this.items.push({
             item: item,
-            state: ItemState.KNOWN,
-            lookMessage: lookMessage,
-            pickupMessage: pickupMessage
+            state: ItemState.KNOWN
         });
     }
 
@@ -54,7 +42,7 @@ class TakeableItems {
         const presentItems = this.presentItems();
         return presentItems.flatMap(itemEntry => Option.forNames(
             new CombinedApplyBuilder(
-                new LogAction(itemEntry.lookMessage),
+                new LogAction(itemEntry.item.lookMessage),
                 new PureAction(() => itemEntry.state = ItemState.KNOWN)
             ),
             ...itemEntry.item.pickupNames
@@ -65,7 +53,7 @@ class TakeableItems {
         return this.knownItems().flatMap(itemEntry => 
             Option.forNames(
                 new CombinedApplyBuilder(...nonNull<ActionBuilder>(
-                    map(itemEntry.pickupMessage, msg => new LogAction(msg)),
+                    map(itemEntry.item.pickupMessage, msg => new LogAction(msg)),
                     new LogAction(`You pick up the ${itemEntry.item.name}.`),
                     new PureAction(() => {
                         itemEntry.state = ItemState.TAKEN;

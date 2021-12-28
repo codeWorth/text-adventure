@@ -3,17 +3,23 @@ import { CombatOption, TargetedCombatAction } from "../../userinput/actions/comb
 import Entity from "../entity";
 import Game from "../game";
 import Player from "../player";
-import { Weapon, TurnAction, WeaponType, EquipHand } from "./weapon";
+import { ItemParams } from "./item";
+import { Weapon, TurnAction, WeaponType, EquipHand, WeaponParams } from "./weapon";
 
-abstract class LightWeapon extends Weapon {
+export type LightWeaponParams = {
+    attackStamina: number;
+    parryStamina: number;
+}
+
+export abstract class LightWeapon extends Weapon {
 
     public readonly attackStamina: number;
     public readonly parryStamina: number;
 
-    constructor(name: string, pickupNames: string[], attackStamina: number, parryStamina: number, hand: EquipHand) {
-        super(name, pickupNames, WeaponType.LIGHT, hand);
-        this.attackStamina = attackStamina;
-        this.parryStamina = parryStamina;
+    constructor(itemParams: ItemParams, weaponParams: WeaponParams, lightWeaponParams: LightWeaponParams) {
+        super(itemParams, weaponParams);
+        this.attackStamina = lightWeaponParams.attackStamina;
+        this.parryStamina = lightWeaponParams.parryStamina;
     }
 
     options(player: Player): CombatOption[] {
@@ -77,6 +83,8 @@ abstract class LightWeapon extends Weapon {
             )
         )
     }
-}
 
-export default LightWeapon;
+    static weaponBuilder() {
+        return super.weaponBuilder().hand(EquipHand.ANY).type(WeaponType.LIGHT);
+    }
+}

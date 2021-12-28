@@ -1,20 +1,27 @@
 import { assertUnreachable } from "../../../util";
 import Entity from "../entity";
 import Game from "../game";
-import HeavyWeapon from "./heavyWeapon";
-import { TurnAction } from "./weapon";
+import { HeavyWeapon, HeavyWeaponParams } from "./heavyWeapon";
+import { ItemParams } from "./item";
+import { TurnAction, WeaponParams } from "./weapon";
 
-class BasicHeavyWeapon extends HeavyWeapon {
+export type BasicHeavyWeaponParams = {
+    attackDamage: number;
+    bashDamage: number;
+    blockChance: number;
+};
+
+export class BasicHeavyWeapon extends HeavyWeapon {
     
     private readonly attackDamage: number;
     private readonly bashDamage: number;
     private readonly blockChance: number;
 
-    constructor(name: string, pickupNames: string[], attackDamage: number, attackStamina: number, bashDamage: number, bashStamina: number, blockChance: number) {
-        super(name, pickupNames, attackStamina, bashStamina);
-        this.attackDamage = attackDamage;
-        this.bashDamage = bashDamage;
-        this.blockChance = blockChance;
+    constructor(itemParams: ItemParams, weaponParams: WeaponParams, heavyWeaponParams: HeavyWeaponParams, params: BasicHeavyWeaponParams) {
+        super(itemParams, weaponParams, heavyWeaponParams);
+        this.attackDamage = params.attackDamage;
+        this.bashDamage = params.bashDamage;
+        this.blockChance = params.blockChance;
     }
 
     attack(source: Entity, target: Entity, targetAction: TurnAction, game: Game, incomingActions: TurnAction[]): void {
@@ -107,5 +114,3 @@ Type: ${this.type}
 Equip slot: ${this.hand}`;
     }
 }
-
-export default BasicHeavyWeapon;

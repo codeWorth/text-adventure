@@ -3,15 +3,20 @@ import { CombatOption, TargetedCombatAction } from "../../userinput/actions/comb
 import Entity from "../entity";
 import Game from "../game";
 import Player from "../player";
-import { EquipHand, TurnAction, Weapon, WeaponType } from "./weapon";
+import { ItemParams } from "./item";
+import { Weapon, EquipHand, TurnAction, WeaponParams, WeaponType } from "./weapon";
 
-abstract class NormalWeapon extends Weapon {
+export type NormalWeaponParams = {
+    stamina: number
+};
+
+export abstract class NormalWeapon extends Weapon {
 
     public readonly stamina: number;
 
-    constructor(name: string, pickupNames: string[], stamina: number, hand: EquipHand) {
-        super(name, pickupNames, WeaponType.NORMAL, hand);
-        this.stamina = stamina;
+    constructor(itemParams: ItemParams, weaponParams: WeaponParams, normalWeaponParams: NormalWeaponParams) {
+        super(itemParams, weaponParams);
+        this.stamina = normalWeaponParams.stamina;
     }
 
     options(player: Player): CombatOption[] {
@@ -50,6 +55,8 @@ abstract class NormalWeapon extends Weapon {
             )
         )
     }
-}
 
-export default NormalWeapon;
+    static weaponBuilder() {
+        return super.weaponBuilder().hand(EquipHand.ANY).type(WeaponType.NORMAL);
+    }
+}

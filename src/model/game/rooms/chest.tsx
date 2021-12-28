@@ -2,16 +2,17 @@ import LogAction from "../../userinput/actions/logAction";
 import PureAction from "../../userinput/actions/pureAction";
 import Option from "../../userinput/option";
 import Game from "../game";
+import { Item } from "../items/item";
 import Player from "../player";
-import TakeableItems, { ItemInfo } from "./takeableItems";
+import TakeableItems from "./takeableItems";
 
 class ChestBuilder {
     public _openMessage: string = "You unlatch the chest and open it up.";
     public _lookMessage: string = "The chest is held closed with a simple latch, which shouldn't be too tough to open.";
     public _names: string[] = [];
-    public _items: ItemInfo[];
+    public _items: Item[];
 
-    private constructor(items: ItemInfo[]) {
+    private constructor(items: Item[]) {
         this._items = items;
     }
 
@@ -39,7 +40,7 @@ class ChestBuilder {
         );
     }
 
-    public static withItems(...items: ItemInfo[]) {
+    public static withItems(...items: Item[]) {
         return new ChestBuilder(items);
     }
 }
@@ -52,7 +53,7 @@ class Chest {
     private readonly names: string[];
     private _isOpen: boolean;
 
-    constructor(items: ItemInfo[], openMessage: string, lookMessage: string, names: string[]) {
+    constructor(items: Item[], openMessage: string, lookMessage: string, names: string[]) {
         this.takeableItems = new TakeableItems(...items);
         this.openMessage = openMessage;
         this.lookMessage = lookMessage;

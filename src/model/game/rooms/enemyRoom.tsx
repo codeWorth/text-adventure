@@ -6,20 +6,46 @@ import PureAction from "../../userinput/actions/pureAction";
 import Option from "../../userinput/option";
 import BasicEnemy from "../enemies/basicEnemy";
 import Game from "../game";
-import BasicNormalWeapon from "../items/basicNormalWeapon";
+import { BasicNormalWeapon } from "../items/basicNormalWeapon";
+import { HealthPotion } from "../items/healthPotion";
 import { Weapon } from "../items/weapon";
 import Room from "../room";
-import TakeableItems from "./takeableItems";
 
 class EnemyRoom extends Room {
 
     private readonly enemy: BasicEnemy;
-    private readonly items: TakeableItems;
 
     constructor(name: string) {
         super(name);
-        this.enemy = new BasicEnemy("Skeleton", 3, 3, new BasicNormalWeapon("Rusty Sword", ["sword"], 2, 1));
-        this.items = new TakeableItems();
+        this.enemy = new BasicEnemy(
+            "Skeleton", 
+            3, 3, 
+            new BasicNormalWeapon(
+                BasicNormalWeapon.itemBuilder()
+                    .name("Rusty Sword")
+                    .pickupNames("sword")
+                    .lookMessage("This old sword has clearly seen better days, but it's better than nothing...")
+                    .build(),
+                BasicNormalWeapon.weaponBuilder().build(),
+                {
+                    stamina: 1
+                },
+                {
+                    damage: 2
+                }
+            ),
+            new HealthPotion(
+                HealthPotion.itemBuilder()
+                    .name("Small Health Potion")
+                    .pickupNames("health potion", "potion")
+                    .build(),
+                {
+                    health: 3
+                }
+            )
+        );
+        // this.enemy.mainHand!.lookMessage = ;
+        //"A small vial with a cork on top. It looks (and smells) like something a vegan would drink: very healthy, and completely disgusting."
     }
 
     getOptions(game: Game): Option[] {
@@ -30,7 +56,7 @@ class EnemyRoom extends Room {
                 ...super.getOptions(game),
                 Option.forName("take", new OptionsBuilder(
                     "You must specify which item to take.",
-                    ...this.items.getTakeOptions(game.player)
+                    ...this.takeableItems.getTakeOptions(game.player)
                 )),
                 Option.forName("look", new LookBuilder(
                     this.getLookDescription(),
@@ -40,7 +66,7 @@ class EnemyRoom extends Room {
                             this.enemy.isAlive()
                                 ? Option.forName(" skeleton", new LogAction("The skeleton is sleeping right now, but you could try to wake it up."))
                                 : undefined,
-                            ...this.items.getLookAtOptions()
+                            ...this.takeableItems.getLookAtOptions()
                         )
                     )
                 )),
@@ -53,9 +79,7 @@ class EnemyRoom extends Room {
                                 game.enterCombat(this.enemy);
                                 this.enemy.addDeathListener(() => {
                                     game.log("The skeleton has been defeated! Its bones fall to the floor, and its rusty sword clatters on top of them.");
-                                    if (this.enemy.mainHand) {
-                                        this.items.addKnownItem(this.enemy.mainHand, "This old sword has clearly seen better days, but it's better than nothing...");
-                                    }
+                                    this.takeableItems.addKnownItem(this.enemy.mainHand as Weapon);
                                 });
                             }))
                         ),
@@ -69,7 +93,7 @@ class EnemyRoom extends Room {
     private getLookDescription(): string {
         if (this.enemy.isAlive()) {
             return "There's a skeleton sitting in the corner. Wonder what it's up to!\n" + this.connections.getDescription();
-        } else if (this.items.itemPresent(this.enemy.mainHand as Weapon)) {
+        } else if (this.takeableItems.itemPresent(this.enemy.mainHand as Weapon)) {
             return "The skeleton's bones lie in a pile in the corner, with its rusty sword nearby.\n" + this.connections.getDescription()
         } else {
             return "The skeleton's bones lie in a pile in the corner.\n" + this.connections.getDescription()

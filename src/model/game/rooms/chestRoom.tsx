@@ -1,5 +1,5 @@
 import Room from "../room";
-import Key from "../items/key";
+import { Key } from "../items/key";
 import Game from "../game";
 import Option from "../../userinput/option";
 import LookBuilder from "../../userinput/actions/lookBuilder";
@@ -13,10 +13,7 @@ class ChestRoom extends Room {
 
     constructor(name: string, largeIronKey: Key) {
         super(name);
-        this.chest = ChestBuilder.withItems({
-            item: largeIronKey,
-            lookMessage: "Surely this large iron key goes to a large iron door..."
-        })
+        this.chest = ChestBuilder.withItems(largeIronKey)
             .names("chest", "wooden chest")
             .build();
     }

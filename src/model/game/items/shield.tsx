@@ -3,15 +3,19 @@ import { CombatOption, TargetedCombatAction } from "../../userinput/actions/comb
 import Entity from "../entity";
 import Game from "../game";
 import Player from "../player";
-import { EquipHand, TurnAction, Weapon, WeaponType } from "./weapon";
+import { ItemParams } from "./item";
+import { Weapon, EquipHand, TurnAction, WeaponParams } from "./weapon";
 
-abstract class Shield extends Weapon {
+export type ShieldParams = {
+    stamina: number
+};
 
+export abstract class Shield extends Weapon {
     public readonly stamina: number;
 
-    constructor(name: string, pickupNames: string[], stamina: number, hand: EquipHand) {
-        super(name, pickupNames, WeaponType.NORMAL, hand);
-        this.stamina = stamina;
+    constructor(itemParams: ItemParams, weaponParams: WeaponParams, shieldParams: ShieldParams) {
+        super(itemParams, weaponParams);
+        this.stamina = shieldParams.stamina;
     }
 
     options(player: Player): CombatOption[] {
@@ -38,6 +42,8 @@ abstract class Shield extends Weapon {
             game.log(`${source.name} was too tired to block.`);
         }
     }
-}
 
-export default Shield;
+    static weaponBuilder() {
+        return super.weaponBuilder().hand(EquipHand.OFF);
+    }
+}

@@ -3,18 +3,24 @@ import { CombatOption, TargetedCombatAction, UntargetedCombatAction } from "../.
 import Entity from "../entity";
 import Game from "../game";
 import Player from "../player";
-import { EquipHand, TurnAction, Weapon, WeaponType } from "./weapon";
+import { ItemParams } from "./item";
+import { Weapon, EquipHand, TurnAction, WeaponParams, WeaponType } from "./weapon";
 
-abstract class HeavyWeapon extends Weapon {
+export type HeavyWeaponParams = {
+    attackStamina: number;
+    bashStamina: number;
+};
+
+export abstract class HeavyWeapon extends Weapon {
 
     private preparedTurns: number;
     public readonly attackStamina: number;
     public readonly bashStamina: number;
 
-    constructor(name: string, pickupNames: string[], attackStamina: number, bashStamina: number) {
-        super(name, pickupNames, WeaponType.HEAVY, EquipHand.BOTH);
-        this.attackStamina = attackStamina;
-        this.bashStamina = bashStamina;
+    constructor(itemParams: ItemParams, weaponParams: WeaponParams, heavyWeaponParams: HeavyWeaponParams) {
+        super(itemParams, weaponParams);
+        this.attackStamina = heavyWeaponParams.attackStamina;
+        this.bashStamina = heavyWeaponParams.bashStamina;
         this.preparedTurns = 0;
     }
 
@@ -106,6 +112,7 @@ abstract class HeavyWeapon extends Weapon {
     abstract attack(source: Entity, target: Entity, targetAction: TurnAction, game: Game, incomingActions: TurnAction[]): void;
     abstract bash(source: Entity, target: Entity, targetAction: TurnAction, game: Game, incomingActions: TurnAction[]): void;
 
+    static weaponBuilder() {
+        return super.weaponBuilder().hand(EquipHand.BOTH).type(WeaponType.HEAVY);
+    }
 }
-
-export default HeavyWeapon;

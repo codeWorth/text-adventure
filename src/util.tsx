@@ -25,3 +25,9 @@ export function none(bools: boolean[]): boolean {
 export function clamp(x: number, min: number, max: number): number {
     return Math.min(Math.max(x, min), max);
 }
+
+export function requireOptional<T>(optional: T | undefined): void {
+    if (optional === undefined) {
+        throw new Error("Required parameter was missing");
+    }
+}

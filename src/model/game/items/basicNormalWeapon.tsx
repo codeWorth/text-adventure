@@ -1,16 +1,21 @@
 import { assertUnreachable } from "../../../util";
 import Entity from "../entity";
 import Game from "../game";
-import NormalWeapon from "./normalWeapon";
-import { EquipHand, TurnAction } from "./weapon";
+import { ItemParams } from "./item";
+import { NormalWeapon, NormalWeaponParams } from "./normalWeapon";
+import { TurnAction, WeaponParams } from "./weapon";
 
-class BasicNormalWeapon extends NormalWeapon {
+export type BasicNormalWeaponParams = {
+    damage: number
+};
+
+export class BasicNormalWeapon extends NormalWeapon {
 
     private readonly damage: number;
 
-    constructor(name: string, pickupNames: string[], damage: number, stamina: number, hand?: EquipHand) {
-        super(name, pickupNames, stamina, hand || EquipHand.ANY);
-        this.damage = damage;
+    constructor(itemParams: ItemParams, weaponParams: WeaponParams, normalWeaponParams: NormalWeaponParams, params: BasicNormalWeaponParams) {
+        super(itemParams, weaponParams, normalWeaponParams);
+        this.damage = params.damage;
     }
 
     details(): string {
@@ -63,5 +68,3 @@ Equip slot: ${this.hand}`;
         source.decreaseStamina(this.stamina);
     }
 }
-
-export default BasicNormalWeapon;

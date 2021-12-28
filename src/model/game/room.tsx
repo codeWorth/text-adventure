@@ -5,15 +5,18 @@ import LogAction from '../userinput/actions/logAction';
 import Option from '../userinput/option';
 import Game from './game';
 import Connections from './rooms/connections';
+import TakeableItems from './rooms/takeableItems';
 const helloMsg = `Well ... hello there! Didn't think you'd get a response did you good sir. But alas, I am here. But I can't tell you much ... cause everything is a secret of course. Good day fair traveler! Best of luck to you!`;
 
 class Room {
     public readonly name: string;
     public readonly connections: Connections;
+    public readonly takeableItems: TakeableItems;
 
-    constructor(name: string) {
+    constructor(name: string, takeableItems?: TakeableItems) {
         this.name = name;
         this.connections = new Connections();
+        this.takeableItems = takeableItems || new TakeableItems();
     }
 
     getOptions(game: Game): Option[] {

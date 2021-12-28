@@ -8,16 +8,13 @@ import Option from "../userinput/option";
 import Enemy from "./enemies/enemy";
 import Entity from "./entity";
 import Game from "./game";
-import BasicNormalWeapon from "./items/basicNormalWeapon";
-import Item from "./items/item";
-import Key from "./items/key";
+import { BasicNormalWeapon } from "./items/basicNormalWeapon";
+import { Key } from "./items/key";
 import { EquipHand, TurnAction, Weapon } from "./items/weapon";
 
 const STAMINA_REST_AMOUNT = 2;
 
 class Player extends Entity {
-    private inventory: Item[];
-
     private combatEnemies: Enemy[];
     public readonly fists: BasicNormalWeapon;
 
@@ -25,7 +22,22 @@ class Player extends Entity {
         super(config.name, 10, 10);
         this.inventory = [];
         this.combatEnemies = [];
-        this.fists = new BasicNormalWeapon("Fists", [], 1, 2, EquipHand.BOTH);
+        this.fists = new BasicNormalWeapon(
+            BasicNormalWeapon.itemBuilder()
+                .name("Fists")
+                .pickupNames()
+                .lookMessage("")
+                .build(),
+            BasicNormalWeapon.weaponBuilder()
+                .hand(EquipHand.BOTH)
+                .build(),
+            {
+                stamina: 2
+            },
+            {
+                damage: 1
+            }
+        );
         this.equipTwoHanded(this.fists);
     }
 
@@ -246,23 +258,10 @@ class Player extends Entity {
         this.removeItem(weapon);
     }
 
-    private getWeaponsInInventory() {
-        return this.inventory.filter(item => item instanceof Weapon)
-            .map(item => item as Weapon);
-    }
-
     hasKey(key: Key): boolean {
         return !!this.inventory.find(item => item === key);
     }
-
-    addItem(item: Item) {
-        this.inventory.push(item);
-    }
-
-    removeItem(item: Item) {
-        this.inventory = this.inventory.filter(_item => _item !== item);
-    }
-
+    
     printBattleInfo(game: Game) {
         game.log(`${this.name}
 Health: ${this.getHealthBar()}

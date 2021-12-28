@@ -1,23 +1,28 @@
-import { assertUnreachable } from "../../../util";
+import { assertUnreachable, requireOptional } from "../../../util";
 import { CombatOption } from "../../userinput/actions/combatActions";
 import Entity from "../entity";
 import Game from "../game";
 import Player from "../player";
-import Item from "./item"
+import { Item, ItemParams } from "./item"
 
-enum WeaponType {
+export type WeaponParams = {
+    type: WeaponType,
+    hand: EquipHand
+};
+
+export enum WeaponType {
     LIGHT = "Light", 
     NORMAL = "Normal",
     HEAVY = "Heavy",
     OTHER = "Other"
 }
 
-enum TurnAction {
+export enum TurnAction {
     NORMAL_ATTACK, BLOCK, LIGHT_ATTACK, PARRY, HEAVY_ATTACK, BASH, REST, PREPARE, NONE
 }
 
 // 0 goes first, then 1, then 2, etc
-function actionOrder(action: TurnAction): number {
+export function actionOrder(action: TurnAction): number {
     switch (action) {
         case TurnAction.NORMAL_ATTACK:
             return 2;
@@ -42,26 +47,25 @@ function actionOrder(action: TurnAction): number {
     }
 }
 
-enum EquipHand {
+export enum EquipHand {
     ANY = "Any hand", 
     MAIN = "Main hand only", 
     OFF = "Off hand only", 
     BOTH = "Two handed"
 }
 
-abstract class Weapon extends Item {
+export abstract class Weapon extends Item {
 
     public readonly type: WeaponType;
     public readonly hand: EquipHand;
 
-    constructor(name: string, pickupNames: string[], type: WeaponType, hand: EquipHand) {
-        super(name, pickupNames);
-        this.type = type;
-        this.hand = hand;
+    constructor(itemParams: ItemParams, weaponParams: WeaponParams) {
+        super(itemParams);
+        this.type = weaponParams.type;
+        this.hand = weaponParams.hand;
     }
 
     abstract options(player: Player): CombatOption[];
-    abstract details(): string;
     finishTurn(owner: Entity, game: Game): void {
         // no-op by default
     }
@@ -76,6 +80,32 @@ abstract class Weapon extends Item {
             game.log(`${source.name} was too tired to attack.`);
         }
     }
+
+    static weaponBuilder(): WeaponBuilder {
+        return new WeaponBuilder();
+    }
 }
 
-export { Weapon, WeaponType, TurnAction, EquipHand, actionOrder };
+class WeaponBuilder {
+    private _type?: WeaponType;
+    private _hand?: EquipHand;
+    
+    type(type: WeaponType): WeaponBuilder {
+        this._type = type;
+        return this;
+    }
+
+    hand(hand: EquipHand): WeaponBuilder {
+        this._hand = hand;
+        return this;
+    }
+
+    build(): WeaponParams {
+        requireOptional(this._type);
+        requireOptional(this._hand);
+        return {
+            type: this._type as WeaponType,
+            hand: this._hand as EquipHand
+        };
+    }
+}

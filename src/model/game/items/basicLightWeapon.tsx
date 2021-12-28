@@ -1,17 +1,23 @@
 import { assertUnreachable } from "../../../util";
 import Entity from "../entity";
 import Game from "../game";
-import LightWeapon from "./lightWeapon";
-import { EquipHand, TurnAction } from "./weapon";
+import { BasicNormalWeaponParams } from "./basicNormalWeapon";
+import { ItemParams } from "./item";
+import { LightWeapon, LightWeaponParams } from "./lightWeapon";
+import { TurnAction, WeaponParams } from "./weapon";
 
-class BasicLightWeapon extends LightWeapon {
+export type BasicLightWeaponParams = {
+    damage: number;
+};
+
+export class BasicLightWeapon extends LightWeapon {
 
     private readonly damage: number;
     private readonly multiplier: number;
 
-    constructor(name: string, pickupNames: string[], damage: number, attackStamina: number, parryStamina: number, hand?: EquipHand) {
-        super(name, pickupNames, attackStamina, parryStamina, hand || EquipHand.ANY);
-        this.damage = damage;
+    constructor(itemParams: ItemParams, weaponParams: WeaponParams, lightWeaponParams: LightWeaponParams, params: BasicNormalWeaponParams) {
+        super(itemParams, weaponParams, lightWeaponParams);
+        this.damage = params.damage;
         this.multiplier = 2;
     }
 
@@ -114,5 +120,3 @@ Equip slot: ${this.hand}`;
         super.doDirectAttack(damage, stamina, source, target, game);
     }
 }
-
-export default BasicLightWeapon;

@@ -1,4 +1,5 @@
 import Game from "./game";
+import { Item } from "./items/item";
 import { Weapon, WeaponType } from "./items/weapon";
 
 type Blocking = {
@@ -16,6 +17,7 @@ class Entity {
 
     public mainHand?: Weapon;
     public offHand?: Weapon;
+    protected inventory: Item[];
 
     private deathListeners: (() => void)[];
     private blocking?: Blocking;
@@ -28,6 +30,7 @@ class Entity {
         this.stamina = maxStamina;
         this.deathListeners = [];
         this.stunnedTurns = 0;
+        this.inventory = [];
     }
 
     get stunned() {
@@ -43,6 +46,19 @@ class Entity {
         const fists = !this.mainHand && !this.offHand;
         const normalWeapon = this.mainHand?.type === WeaponType.NORMAL || this.offHand?.type === WeaponType.NORMAL;
         return fists || normalWeapon;
+    }
+
+    getWeaponsInInventory() {
+        return this.inventory.filter(item => item instanceof Weapon)
+            .map(item => item as Weapon);
+    }
+
+    addItem(item: Item) {
+        this.inventory.push(item);
+    }
+
+    removeItem(item: Item) {
+        this.inventory = this.inventory.filter(_item => _item !== item);
     }
 
     getHealth() {
