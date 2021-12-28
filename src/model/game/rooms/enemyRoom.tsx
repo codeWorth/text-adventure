@@ -76,10 +76,9 @@ class EnemyRoom extends Room {
                             Option.forName(" skeleton", new PureAction(() => {
                                 game.log("The skeleton has woken up, and it doesn't look too well rested... Prepare for a fight!");
                                 game.enterCombat(this.enemy);
-                                this.enemy.addDeathListener(() => {
-                                    game.log("The skeleton has been defeated! Its bones fall to the floor, and its rusty sword clatters on top of them.");
-                                    this.takeableItems.addKnownItem(this.enemy.mainHand as Weapon);
-                                });
+                                this.enemy.addDeathListener(game =>
+                                    game.log("The skeleton has been defeated! Its bones fall to the floor, and its rusty sword clatters on top of them.")
+                                );
                             }))
                         ),
                         "wake",

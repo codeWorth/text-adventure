@@ -11,6 +11,11 @@ abstract class Enemy extends Entity {
     constructor(name: string, maxHealth: number, maxStamina: number, drops?: Item[]) {
         super(name, maxHealth, maxStamina);
         this.drops = drops || [];
+        this.addDeathListener(game => {
+            const itemsStr = this.drops.map(item => `\t- ${item.name}`).join("\n");
+            game.log(`${name} is defeated, and drops:\n${itemsStr}`);
+            this.drops.forEach(item => game.getCurrentRoom().takeableItems.addKnownItem(item));
+        });
     }
 
     protected abstract decideAction(game: Game): TurnAction;

@@ -7,7 +7,7 @@ import Enemy from "./enemy";
 class BasicEnemy extends Enemy {
 
     constructor(name: string, maxHealth: number, maxStamina: number, weapon: NormalWeapon, ...drops: Item[]) {
-        super(name, maxHealth, maxStamina, [...drops]);
+        super(name, maxHealth, maxStamina, [weapon, ...drops]);
         this.mainHand = weapon;
     }
 

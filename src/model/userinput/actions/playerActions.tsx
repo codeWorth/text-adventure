@@ -1,4 +1,5 @@
 import Game from "../../game/game";
+import ConsumableItem from "../../game/items/consumableItem";
 import { Weapon } from "../../game/items/weapon";
 import Player from "../../game/player";
 import Option from "../option";
@@ -95,6 +96,35 @@ class DetailsAction implements ActionBuilder {
     }
 }
 
+class ConsumableAction implements ActionBuilder {
+    
+    private readonly items: ConsumableItem[];
+
+    constructor(...items: ConsumableItem[]) {
+        this.items = items;
+    }
+
+    context(): Option[] {
+        return this.items.filter(item => item.canUse)
+            .flatMap(item => Option.forNames(
+                new PureAction(game => item.consume(game)),
+                ...item.pickupNames
+            ));
+    }
+
+    apply(game: Game): void {
+        game.error("You must specify which item to use.");
+    }
+
+    terminal(): boolean {
+        return false;
+    }
+
+    usage(): string {
+        return "<item>";
+    }
+}
+
 class PlayerAction implements ActionBuilder {
 
     private readonly player: Player;
@@ -124,6 +154,7 @@ class PlayerAction implements ActionBuilder {
                     ...this.player.unequipOptions()
                 )),
                 Option.forName("details", new DetailsAction(...this.player.getWeapons())),
+                Option.forName("use", new ConsumableAction(...this.player.getConsumableItems())),
                 Option.forName("unlockall", new PureAction(game => {
                     game.unlockAllRooms();
                     game.log("All doors have been unlocked!");

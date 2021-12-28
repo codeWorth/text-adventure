@@ -1,4 +1,6 @@
+import { clamp } from "../../util";
 import Game from "./game";
+import ConsumableItem from "./items/consumableItem";
 import { Item } from "./items/item";
 import { Weapon, WeaponType } from "./items/weapon";
 
@@ -19,7 +21,7 @@ class Entity {
     public offHand?: Weapon;
     protected inventory: Item[];
 
-    private deathListeners: (() => void)[];
+    private deathListeners: ((game: Game) => void)[];
     private blocking?: Blocking;
 
     constructor(name: string, maxHealth: number, maxStamina: number) {
@@ -37,7 +39,7 @@ class Entity {
         return this.stunnedTurns > 0;
     }
 
-    addDeathListener(listener: () => void) {
+    addDeathListener(listener: (game: Game) => void) {
         this.deathListeners.push(listener);
     }
 
@@ -51,6 +53,11 @@ class Entity {
     getWeaponsInInventory() {
         return this.inventory.filter(item => item instanceof Weapon)
             .map(item => item as Weapon);
+    }
+
+    getConsumableItems() {
+        return this.inventory.filter(item => item instanceof ConsumableItem)
+            .map(item => item as ConsumableItem);
     }
 
     addItem(item: Item) {
@@ -78,12 +85,7 @@ class Entity {
     }
 
     setHealth(health: number) {
-        if (health <= 0 && this.isAlive()) {
-            this.health = 0;
-            this.deathListeners.forEach(listener => listener());
-        } else {
-            this.health = Math.min(this.maxHealth, health);
-        }
+        this.health = clamp(health, 0, this.maxHealth);
     }
 
     decreaseStamina(amount: number) {
@@ -144,10 +146,14 @@ Stamina: ${this.getStaminaBar()}`);
     }
 
     finishTurn(game: Game) {
-        this.blocking = undefined;
-        if (this.stunned) {
-            this.stunnedTurns--;
-            if (!this.stunned) game.log(`${this.name} has recovered from being stunned.`);
+        if (this.isAlive()) {
+            this.blocking = undefined;
+            if (this.stunned) {
+                this.stunnedTurns--;
+                if (!this.stunned) game.log(`${this.name} has recovered from being stunned.`);
+            }
+        } else {
+            this.deathListeners.forEach(listener => listener(game));
         }
     }
 }

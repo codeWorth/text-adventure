@@ -57,7 +57,7 @@ class TakeableItems {
                     new LogAction(`You pick up the ${itemEntry.item.name}.`),
                     new PureAction(() => {
                         itemEntry.state = ItemState.TAKEN;
-                        player.addItem(itemEntry.item);
+                        itemEntry.item.addToInventory(player);
                     })
                 )),
                 ...itemEntry.item.pickupNames

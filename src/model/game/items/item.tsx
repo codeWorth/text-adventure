@@ -1,4 +1,5 @@
 import { requireOptional } from "../../../util";
+import Entity from "../entity";
 
 export type ItemParams = {
     name: string;
@@ -23,6 +24,10 @@ export abstract class Item {
     }
 
     abstract details(): string;
+
+    addToInventory(entity: Entity) {
+        entity.addItem(this);
+    }
 
     static itemBuilder(): ItemBuilder {
         return new ItemBuilder();

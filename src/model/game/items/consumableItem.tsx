@@ -16,9 +16,8 @@ abstract class ConsumableItem extends Item {
         if (this.owner !== undefined) {
             this.owner.removeItem(this);
         }
-
-        entity.addItem(this);
         this.owner = entity;
+        super.addToInventory(entity);
     }
 
     consume(game: Game): void {
